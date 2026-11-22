@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ekonomikollen – Hushållsbudget, KOV 2027 & Nollbudget</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Firebase Compat SDK för Google Sign-In & Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 20px;
+      max-width: 1220px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    @media (max-width: 960px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 540px) {
+      .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid-4 .card, .grid-2 .card {
+      margin-bottom: 0;
+    }
+
+    .card-title {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .big-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .sub-value {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.9; }
+
+    .btn-green {
+      background: var(--green);
+      color: #052e16;
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 6px 10px;
+      font-size: 0.78rem;
+    }
+
+    input[type="text"], input[type="number"], input[type="month"], select {
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .row-flex {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    /* Bankens 80/20 Fördelningsstapel & Korgar */
+    .bucket-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .bucket-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 520px) {
+      .bucket-grid { grid-template-columns: 1fr; }
+    }
+
+    .bucket-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .bucket-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .progress-bg {
+      height: 8px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s;
+    }
+
+    /* Tabell för Budgetrader */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    td input[type="number"] {
+      padding: 6px 8px;
+      max-width: 115px;
+    }
+
+    .tag-pill {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .tag-rakningar { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .tag-kredit { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+    .tag-bolan { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
+    .tag-buffert { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+    .tag-mal { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
+
+    .chart-wrapper {
+      position: relative;
+      height: 290px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .kov-member-pill {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 6px 4px 0;
+    }
+
+    .status-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>💰 Ekonomikollen <span class="badge">Nollbudget • KOV 2027</span></h1>
+      <div class="sub-value">Privat hushållsbudget, kreditkortsfakturor & flerårsstatistik</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <span class="badge" id="authStatusBadge"><span class="status-dot" style="background:var(--yellow);"></span>Ej inloggad (Lokal lagring)</span>
+      <button class="btn" id="googleLoginBtn" type="button">Logga in med Google</button>
+      <button class="btn btn-secondary" id="googleLogoutBtn" type="button" style="display:none;">Logga ut</button>
+    </div>
+  </header>
+
+  <!-- 1. ROLIGA NYCKELTAL & HISTORISKA SNITT -->
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">Snitt Matkostnad / mån</div>
+      <div class="big-value" id="kpiAvgFood" style="color: var(--yellow);">0 kr</div>
+      <div class="sub-value" id="kpiAvgFoodSub">KOV 2027 rek: 8 300 kr/mån</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Snitt Drivmedel / mån</div>
+      <div class="big-value" id="kpiAvgFuel" style="color: var(--accent);">0 kr</div>
+      <div class="sub-value" id="kpiAvgFuelSub">Baserat på sparade månader</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Snitt Utgifter / mån</div>
+      <div class="big-value" id="kpiAvgExpense">0 kr</div>
+      <div class="sub-value" id="kpiAvgExpenseSub">Räkningar + Kreditkort + Bolån</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Snitt Sparkvot (Mål: 20%)</div>
+      <div class="big-value" id="kpiAvgSavings" style="color: var(--green);">0 %</div>
+      <div class="sub-value" id="kpiAvgSavingsSub">Buffert (15%) + Mål (5%)</div>
+    </div>
+  </div>
+
+  <!-- 2. MÅNADSVÄLJARE, INKOMSTER & NOLLBUDGET-MALL (80/20) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Aktuell budgetmånad & Nollbudget (80/20-modellen)</div>
+        <div class="sub-value" style="margin-top:0;">Varje krona av inkomsten fördelas till 0 kr kvar.</div>
+      </div>
+      <div class="row-flex">
+        <label style="min-width:165px;">
+          Välj månad
+          <input type="month" id="monthPicker" />
+        </label>
+        <button class="btn btn-secondary" id="copyPrevMonthBtn" type="button" title="Kopiera planering & fasta poster från föregående månad">📋 Kopiera förra månaden</button>
+        <button class="btn btn-green" id="saveMonthBtn" type="button">💾 Spara månad</button>
+      </div>
+    </div>
+
+    <!-- Inkomster -->
+    <div class="row-flex" style="background: rgba(15,23,42,0.45); padding:14px; border-radius:10px; border:1px solid var(--card-border);">
+      <label style="flex:1; min-width:150px;">
+        Lön 1 (netto kr)
+        <input type="number" id="incSalary1" value="0" step="100" />
+      </label>
+      <label style="flex:1; min-width:150px;">
+        Lön 2 (netto kr)
+        <input type="number" id="incSalary2" value="0" step="100" />
+      </label>
+      <label style="flex:1; min-width:150px;">
+        Barnbidrag & Övrigt (t.ex. hyra)
+        <input type="number" id="incOther" value="0" step="100" />
+      </label>
+      <div style="flex:1; min-width:180px; text-align:right;">
+        <div class="card-title" style="margin-bottom:2px;">Total Nettoinkomst</div>
+        <div style="font-size:1.45rem; font-weight:700; color:var(--green);" id="totalIncomeDisplay">0 kr</div>
+        <div class="sub-value" style="margin-top:0;" id="zeroBudgetStatus">Nollbudget-saldo: 0 kr kvar</div>
+      </div>
+    </div>
+
+    <!-- Bankens 5 korgar: 80% Bankkonto (30/30/20) + 20% Sparkonto (15/5) -->
+    <div class="bucket-grid">
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--accent);">Räkningar (30%)</span>
+          <span id="targetRakningar">Mål: 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualRakningar">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barRakningar" style="width:0%; background:var(--accent);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planRakningarText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--yellow);">Kreditkort (30%)</span>
+          <span id="targetKredit">Mål: 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualKredit">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barKredit" style="width:0%; background:var(--yellow);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planKreditText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--purple);">Bolån (20%)</span>
+          <span id="targetBolan">Mål: 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualBolan">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barBolan" style="width:0%; background:var(--purple);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBolanText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--green);">Buffert (15%)</span>
+          <span id="targetBuffert">Mål: 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualBuffert">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barBuffert" style="width:0%; background:var(--green);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBuffertText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:#f472b6;">Sparmål (5%)</span>
+          <span id="targetMal">Mål: 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualMal">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barMal" style="width:0%; background:#f472b6;"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planMalText">Planerat: 0 kr</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BUDGETPOSTER: PLANERING VS UTFALL (INKL. KREDITKORTSFAKTUROR) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Månadens Poster – Planering vs. Faktiskt Utfall</div>
+        <div class="sub-value" style="margin-top:0;">Lägg in kreditkortsfakturorna (Matkort, Drivmedel, Övrigt) och fasta räkningar för vald månad.</div>
+      </div>
+      <div class="row-flex">
+        <input type="text" id="newItemName" placeholder="Ny post (t.ex. Amex / Fritid)" style="width:190px;" />
+        <select id="newItemBucket" style="width:155px;">
+          <option value="kredit">Kreditkort (30%)</option>
+          <option value="rakningar">Räkningar (30%)</option>
+          <option value="bolan">Bolån (20%)</option>
+          <option value="buffert">Buffert (15%)</option>
+          <option value="mal">Sparmål (5%)</option>
+        </select>
+        <button class="btn" id="addItemBtn" type="button">+ Lägg till post</button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Kategori / Kreditkort</th>
+            <th>Kontokorg</th>
+            <th>KOV 2027 Riktvärde</th>
+            <th>Planerat (kr)</th>
+            <th>Utfall / Faktura (kr)</th>
+            <th>Differens</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="budgetTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. KONSUMENTVERKET 2027 REFERENSKALKYLATOR -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Konsumentverkets Hushållskostnader 2027 – Referens</div>
+        <div class="sub-value" style="margin-top:0;">
+          Officiella schabloner för mat, kläder, hygien, barnutrustning och gemensamma hushållskostnader (inkl. avdrag -229 kr/mån för barn under 8 år).
+        </div>
+      </div>
+      <div class="row-flex">
+        <select id="kovLunchMode" style="width:220px;">
+          <option value="allHome">All mat lagas hemma</option>
+          <option value="noWeekdayLunch">Utom lunch vardagar</option>
+        </select>
+        <button class="btn btn-secondary" id="applyKovToPlanBtn" type="button">⬇️ Fyll i KOV-värden som Planerat</button>
+      </div>
+    </div>
+
+    <!-- Familjemedlemmar i KOV-kalkylen -->
+    <div style="margin-top:14px;">
+      <div id="kovMembersList"></div>
+      <div class="row-flex" style="margin-top:10px;">
+        <input type="text" id="kovNewName" placeholder="Namn (t.ex. Barn 3)" style="width:150px;" />
+        <select id="kovNewAge" style="width:150px;">
+          <option value="0">0 år</option>
+          <option value="1-3">1–3 år</option>
+          <option value="4-6">4–6 år</option>
+          <option value="7-10">7–10 år</option>
+          <option value="11-14">11–14 år</option>
+          <option value="15-17">15–17 år</option>
+          <option value="18-24">18–24 år</option>
+          <option value="25-50" selected>25–50 år</option>
+          <option value="51-70">51–70 år</option>
+          <option value="71+">71+ år</option>
+        </select>
+        <button class="btn btn-secondary" id="addKovMemberBtn" type="button">+ Lägg till person</button>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-top:16px; margin-bottom:0;">
+      <div class="bucket-box">
+        <div class="card-title">KOV Mat / mån</div>
+        <div style="font-size:1.35rem; font-weight:700; color:var(--yellow);" id="kovTotalFood">0 kr</div>
+      </div>
+      <div class="bucket-box">
+        <div class="card-title">KOV Individuellt övrigt</div>
+        <div style="font-size:1.35rem; font-weight:700;" id="kovTotalIndiv">0 kr</div>
+      </div>
+      <div class="bucket-box">
+        <div class="card-title">KOV Gemensamt hushåll</div>
+        <div style="font-size:1.35rem; font-weight:700;" id="kovTotalShared">0 kr</div>
+      </div>
+      <div class="bucket-box">
+        <div class="card-title">KOV Totalt (exkl. boende)</div>
+        <div style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="kovGrandTotal">0 kr</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. RAPPORTER & FLERÅRSSTATISTIK -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Historisk Trend – Matkostnad & Totala Utgifter per månad</div>
+      <div class="chart-wrapper">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Månadens Fördelning – Planerat vs. Utfall per Korg</div>
+      <div class="chart-wrapper">
+        <canvas id="bucketChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CSV-BACKUP & MOLNSTATUS -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">🔒 Privat Molnsynk (Firebase ekonomikollen-640b1) & CSV-Export</div>
+        <div class="sub-value" style="margin-top:0;" id="cloudSyncStatusText">Ansluten till projektet ekonomikollen-640b1. Logga in med Google högst upp för att synka historiken.</div>
+      </div>
+      <button class="btn btn-secondary" id="exportCsvBtn" type="button">📥 Exportera all historik (CSV)</button>
+    </div>
+  </div>
+
+  <script>
+    // --- FÄRDIGKOPPLAD FIREBASE-KONFIGURATION ---
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyDtOdshfo5PeizYLk5IGthve-WEBogdaj0",
+      authDomain: "ekonomikollen-640b1.firebaseapp.com",
+      databaseURL: "https://ekonomikollen-640b1-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ekonomikollen-640b1",
+      storageBucket: "ekonomikollen-640b1.firebasestorage.app",
+      messagingSenderId: "842597703623",
+      appId: "1:842597703623:web:3469a987e600cd6cc703e2",
+      measurementId: "G-PGRGZQQ1SD"
+    };
+
+    // --- KONSUMENTVERKET 2027 DATA (FRÅN OFFICIELL PDF) ---
+    const KOV_2027 = {
+      foodAllHome: {
+        '0': 1050, '1-3': 1120, '4-6': 1730, '7-10': 2160, '11-14': 2680,
+        '15-17': 3090, '18-24': 2870, '25-50': 2760, '51-70': 2530, '71+': 2480
+      },
+      foodNoWeekdayLunch: {
+        '0': 720, '1-3': 840, '4-6': 1340, '7-10': 1670, '11-14': 2070,
+        '15-17': 2390, '18-24': 2220, '25-50': 2130, '51-70': 1950, '71+': 1920
+      },
+      indivOtherSum: {
+        '0': 3030, '1-3': 2820, '4-6': 2030, '7-10': 2140, '11-14': 2150,
+        '15-17': 2490, '18-24': 2290, '25-50': 2250, '51-70': 2150, '71+': 1980
+      },
+      sharedHousehold: {
+        1: { forbrukning: 210, hemutrustning: 930, internetMobil: 1010, media: 730, el: 500, va: 230, hemforsakring: 150 },
+        2: { forbrukning: 310, hemutrustning: 1040, internetMobil: 1240, media: 780, el: 660, va: 460, hemforsakring: 170 },
+        3: { forbrukning: 470, hemutrustning: 1320, internetMobil: 1470, media: 830, el: 880, va: 690, hemforsakring: 210 },
+        4: { forbrukning: 570, hemutrustning: 1580, internetMobil: 1710, media: 830, el: 1090, va: 930, hemforsakring: 260 },
+        5: { forbrukning: 700, hemutrustning: 1800, internetMobil: 1940, media: 830, el: 1270, va: 1140, hemforsakring: 300 },
+        6: { forbrukning: 800, hemutrustning: 1970, internetMobil: 2170, media: 830, el: 1440, va: 1380, hemforsakring: 350 },
+        7: { forbrukning: 910, hemutrustning: 2070, internetMobil: 2410, media: 980, el: 1610, va: 1610, hemforsakring: 390 }
+      }
+    };
+
+    // Förifylld familj: Jonny, Maria, Theo (4-6), Amanda (0)
+    let kovMembers = JSON.parse(localStorage.getItem('ekonomikollen_kov_members') || 'null') || [
+      { id: 'm1', name: 'Jonny', age: '25-50' },
+      { id: 'm2', name: 'Maria', age: '25-50' },
+      { id: 'm3', name: 'Theo', age: '4-6' },
+      { id: 'm4', name: 'Amanda', age: '0' }
+    ];
+
+    let allMonthsData = JSON.parse(localStorage.getItem('ekonomikollen_months') || '{}');
+    let currentUser = null;
+    let dbRef = null;
+    let trendChartInst = null;
+    let bucketChartInst = null;
+
+    function getCurrentMonthKey() {
+      const picker = document.getElementById('monthPicker');
+      if (!picker.value) {
+        const now = new Date();
+        picker.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      }
+      return picker.value;
+    }
+
+    function calculateKovTotals() {
+      const mode = document.getElementById('kovLunchMode').value;
+      const foodTable = mode === 'allHome' ? KOV_2027.foodAllHome : KOV_2027.foodNoWeekdayLunch;
+      const count = Math.min(7, Math.max(1, kovMembers.length));
+      const shared = { ...KOV_2027.sharedHousehold[count] };
+
+      // Fotnot 5 i KOV 2027: Minska internet/mobil med 229 kr/mån om barn under 8 år finns
+      const hasChildUnder8 = kovMembers.some(m => ['0', '1-3', '4-6'].includes(m.age));
+      if (hasChildUnder8) {
+        shared.internetMobil = Math.max(0, shared.internetMobil - 229);
+      }
+
+      let foodSum = 0;
+      let indivSum = 0;
+      kovMembers.forEach(m => {
+        foodSum += foodTable[m.age] || 0;
+        indivSum += KOV_2027.indivOtherSum[m.age] || 0;
+      });
+
+      const sharedSum = Object.values(shared).reduce((a, b) => a + b, 0);
+
+      document.getElementById('kovTotalFood').textContent = `${foodSum.toLocaleString('sv-SE')} kr`;
+      document.getElementById('kovTotalIndiv').textContent = `${indivSum.toLocaleString('sv-SE')} kr`;
+      document.getElementById('kovTotalShared').textContent = `${sharedSum.toLocaleString('sv-SE')} kr`;
+      document.getElementById('kovGrandTotal').textContent = `${(foodSum + indivSum + sharedSum).toLocaleString('sv-SE')} kr`;
+      document.getElementById('kpiAvgFoodSub').textContent = `KOV 2027 rek: ${foodSum.toLocaleString('sv-SE')} kr/mån`;
+
+      return { foodSum, indivSum, sharedSum, shared };
+    }
+
+    function renderKovMembers() {
+      const container = document.getElementById('kovMembersList');
+      container.innerHTML = kovMembers.map(m => `
+        <span class="kov-member-pill">
+          <strong>${m.name}</strong> (${m.age} år)
+          <span style="cursor:pointer; color:var(--red); font-weight:700;" onclick="removeKovMember('${m.id}')">✕</span>
+        </span>
+      `).join('');
+      localStorage.setItem('ekonomikollen_kov_members', JSON.stringify(kovMembers));
+      calculateKovTotals();
+    }
+
+    window.removeKovMember = function(id) {
+      if (kovMembers.length <= 1) return;
+      kovMembers = kovMembers.filter(m => m.id !== id);
+      renderKovMembers();
+      renderMonthTable();
+    };
+
+    function createDefaultItemsForMonth() {
+      const kov = calculateKovTotals();
+      return [
+        { id: 'i1', name: 'Kreditkort: Mat & Dagligvaror (ICA)', bucket: 'kredit', kovKey: 'food', planned: kov.foodSum + kov.shared.forbrukning, actual: 0 },
+        { id: 'i2', name: 'Kreditkort: Drivmedel & Bil', bucket: 'kredit', kovKey: null, planned: 2500, actual: 0 },
+        { id: 'i3', name: 'Kreditkort: Övrigt (Kläder, Hygien, Lek)', bucket: 'kredit', kovKey: 'indiv', planned: kov.indivSum, actual: 0 },
+        { id: 'i4', name: 'El & Uppvärmning (Ellevio / Bixia)', bucket: 'rakningar', kovKey: 'el', planned: 2600, actual: 0 },
+        { id: 'i5', name: 'Vatten, Avlopp & Renhållning', bucket: 'rakningar', kovKey: 'va', planned: kov.shared.va, actual: 0 },
+        { id: 'i6', name: 'Bredband, Mobil & Media', bucket: 'rakningar', kovKey: 'media', planned: kov.shared.internetMobil + kov.shared.media, actual: 0 },
+        { id: 'i7', name: 'Försäkringar (Hem, Barn, Bil)', bucket: 'rakningar', kovKey: 'ins', planned: 1500, actual: 0 },
+        { id: 'i8', name: 'Bolån (Ränta & Amortering)', bucket: 'bolan', kovKey: null, planned: 10000, actual: 0 },
+        { id: 'i9', name: 'Buffertsparande (15%)', bucket: 'buffert', kovKey: null, planned: 7500, actual: 0 },
+        { id: 'i10', name: 'Målsparande / ISK (5%)', bucket: 'mal', kovKey: null, planned: 2500, actual: 0 }
+      ];
+    }
+
+    function getMonthRecord(monthKey) {
+      if (!allMonthsData[monthKey]) {
+        allMonthsData[monthKey] = {
+          income: { salary1: 30000, salary2: 25000, other: 2650 },
+          items: createDefaultItemsForMonth()
+        };
+      }
+      return allMonthsData[monthKey];
+    }
+
+    function getKovReferenceForRow(item, kov) {
+      if (item.kovKey === 'food') return `${(kov.foodSum + kov.shared.forbrukning).toLocaleString('sv-SE')} kr`;
+      if (item.kovKey === 'indiv') return `${kov.indivSum.toLocaleString('sv-SE')} kr`;
+      if (item.kovKey === 'el') return `${kov.shared.el.toLocaleString('sv-SE')} kr (lgh)`;
+      if (item.kovKey === 'va') return `${kov.shared.va.toLocaleString('sv-SE')} kr`;
+      if (item.kovKey === 'media') return `${(kov.shared.internetMobil + kov.shared.media).toLocaleString('sv-SE')} kr`;
+      if (item.kovKey === 'ins') return `${kov.shared.hemforsakring.toLocaleString('sv-SE')} kr (hem)`;
+      return '–';
+    }
+
+    const BUCKET_LABELS = {
+      rakningar: { label: 'Räkningar (30%)', cls: 'tag-rakningar' },
+      kredit: { label: 'Kreditkort (30%)', cls: 'tag-kredit' },
+      bolan: { label: 'Bolån (20%)', cls: 'tag-bolan' },
+      buffert: { label: 'Buffert (15%)', cls: 'tag-buffert' },
+      mal: { label: 'Sparmål (5%)', cls: 'tag-mal' }
+    };
+
+    function renderMonthTable() {
+      const monthKey = getCurrentMonthKey();
+      const record = getMonthRecord(monthKey);
+      const kov = calculateKovTotals();
+
+      document.getElementById('incSalary1').value = record.income.salary1 || 0;
+      document.getElementById('incSalary2').value = record.income.salary2 || 0;
+      document.getElementById('incOther').value = record.income.other || 0;
+
+      const tbody = document.getElementById('budgetTableBody');
+      tbody.innerHTML = '';
+
+      record.items.forEach((item, idx) => {
+        const diff = (Number(item.planned) || 0) - (Number(item.actual) || 0);
+        const isSaving = item.bucket === 'buffert' || item.bucket === 'mal';
+        const diffColor = item.actual === 0 ? 'var(--muted)' : (isSaving ? (diff <= 0 ? 'var(--green)' : 'var(--red)') : (diff >= 0 ? 'var(--green)' : 'var(--red)'));
+        const bInfo = BUCKET_LABELS[item.bucket] || BUCKET_LABELS.kredit;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.name}</strong></td>
+          <td><span class="tag-pill ${bInfo.cls}">${bInfo.label}</span></td>
+          <td style="color:var(--muted);">${getKovReferenceForRow(item, kov)}</td>
+          <td><input type="number" value="${item.planned}" step="50" onchange="updateItemVal(${idx}, 'planned', this.value)" /></td>
+          <td><input type="number" value="${item.actual}" step="50" onchange="updateItemVal(${idx}, 'actual', this.value)" /></td>
+          <td style="font-weight:700; color:${diffColor};">${diff >= 0 ? '+' : ''}${diff.toLocaleString('sv-SE')} kr</td>
+          <td><button class="btn btn-danger" type="button" onclick="deleteBudgetItem(${idx})">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      recalculateBudgetsAndCharts();
+    }
+
+    window.updateItemVal = function(idx, field, val) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items[idx][field] = Number(val) || 0;
+      renderMonthTable();
+    };
+
+    window.deleteBudgetItem = function(idx) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items.splice(idx, 1);
+      renderMonthTable();
+    };
+
+    function recalculateBudgetsAndCharts() {
+      const monthKey = getCurrentMonthKey();
+      const record = getMonthRecord(monthKey);
+
+      record.income.salary1 = Number(document.getElementById('incSalary1').value) || 0;
+      record.income.salary2 = Number(document.getElementById('incSalary2').value) || 0;
+      record.income.other = Number(document.getElementById('incOther').value) || 0;
+
+      const totalInc = record.income.salary1 + record.income.salary2 + record.income.other;
+      document.getElementById('totalIncomeDisplay').textContent = `${totalInc.toLocaleString('sv-SE')} kr`;
+
+      const sums = {
+        rakningar: { planned: 0, actual: 0, pct: 0.30 },
+        kredit: { planned: 0, actual: 0, pct: 0.30 },
+        bolan: { planned: 0, actual: 0, pct: 0.20 },
+        buffert: { planned: 0, actual: 0, pct: 0.15 },
+        mal: { planned: 0, actual: 0, pct: 0.05 }
+      };
+
+      let totalPlanned = 0;
+      record.items.forEach(item => {
+        if (sums[item.bucket]) {
+          sums[item.bucket].planned += Number(item.planned) || 0;
+          sums[item.bucket].actual += Number(item.actual) || 0;
+        }
+        totalPlanned += Number(item.planned) || 0;
+      });
+
+      const zeroDiff = totalInc - totalPlanned;
+      const zeroEl = document.getElementById('zeroBudgetStatus');
+      if (zeroDiff === 0) {
+        zeroEl.style.color = 'var(--green)';
+        zeroEl.textContent = '✓ Perfekt nollbudget (0 kr ofördelat)';
+      } else if (zeroDiff > 0) {
+        zeroEl.style.color = 'var(--yellow)';
+        zeroEl.textContent = `${zeroDiff.toLocaleString('sv-SE')} kr kvar att fördela till 0 kr`;
+      } else {
+        zeroEl.style.color = 'var(--red)';
+        zeroEl.textContent = `Överbudgeterat med ${Math.abs(zeroDiff).toLocaleString('sv-SE')} kr`;
+      }
+
+      const mapKeys = [
+        { key: 'rakningar', cap: 'Rakningar' },
+        { key: 'kredit', cap: 'Kredit' },
+        { key: 'bolan', cap: 'Bolan' },
+        { key: 'buffert', cap: 'Buffert' },
+        { key: 'mal', cap: 'Mal' }
+      ];
+
+      mapKeys.forEach(({ key, cap }) => {
+        const target = Math.round(totalInc * sums[key].pct);
+        const actual = sums[key].actual;
+        const planned = sums[key].planned;
+        const pctFill = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 0;
+
+        document.getElementById(`target${cap}`).textContent = `Mål: ${target.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`actual${cap}`).textContent = `Utfall: ${actual.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`plan${cap}Text`).textContent = `Planerat: ${planned.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`bar${cap}`).style.width = `${pctFill}%`;
+      });
+
+      updateHistoricalKpisAndCharts(sums);
+    }
+
+    function updateHistoricalKpisAndCharts(currentSums) {
+      const monthKeys = Object.keys(allMonthsData).sort();
+      let foodTotal = 0, foodMonths = 0;
+      let fuelTotal = 0, fuelMonths = 0;
+      let expTotal = 0, expMonths = 0;
+      let savPctSum = 0, savMonths = 0;
+
+      const labels = [];
+      const foodSeries = [];
+      const totalExpSeries = [];
+
+      monthKeys.forEach(mk => {
+        const rec = allMonthsData[mk];
+        if (!rec || !rec.items) return;
+
+        let mFood = 0, mFuel = 0, mExp = 0, mSav = 0;
+        const mInc = (rec.income?.salary1 || 0) + (rec.income?.salary2 || 0) + (rec.income?.other || 0);
+
+        rec.items.forEach(it => {
+          const val = Number(it.actual) || 0;
+          const lower = it.name.toLowerCase();
+          if (lower.includes('mat') || lower.includes('ica')) mFood += val;
+          if (lower.includes('drivmedel') || lower.includes('bensin') || lower.includes('bil')) mFuel += val;
+          if (it.bucket === 'buffert' || it.bucket === 'mal') mSav += val;
+          else mExp += val;
+        });
+
+        if (mFood > 0) { foodTotal += mFood; foodMonths++; }
+        if (mFuel > 0) { fuelTotal += mFuel; fuelMonths++; }
+        if (mExp > 0) {
+          expTotal += mExp;
+          expMonths++;
+          labels.push(mk);
+          foodSeries.push(mFood);
+          totalExpSeries.push(mExp);
+        }
+        if (mInc > 0 && (mSav > 0 || mExp > 0)) {
+          savPctSum += (mSav / mInc) * 100;
+          savMonths++;
+        }
+      });
+
+      document.getElementById('kpiAvgFood').textContent = foodMonths > 0 ? `${Math.round(foodTotal / foodMonths).toLocaleString('sv-SE')} kr` : '0 kr';
+      document.getElementById('kpiAvgFuel').textContent = fuelMonths > 0 ? `${Math.round(fuelTotal / fuelMonths).toLocaleString('sv-SE')} kr` : '0 kr';
+      document.getElementById('kpiAvgExpense').textContent = expMonths > 0 ? `${Math.round(expTotal / expMonths).toLocaleString('sv-SE')} kr` : '0 kr';
+      document.getElementById('kpiAvgSavings').textContent = savMonths > 0 ? `${(savPctSum / savMonths).toFixed(1).replace('.', ',')} %` : '0 %';
+
+      const ctx1 = document.getElementById('trendChart').getContext('2d');
+      if (trendChartInst) trendChartInst.destroy();
+      trendChartInst = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: labels.length ? labels : [getCurrentMonthKey()],
+          datasets: [
+            { label: 'Matkostnad (kr)', data: foodSeries.length ? foodSeries : [0], backgroundColor: '#eab308', borderRadius: 5 },
+            { label: 'Totala utgifter (kr)', data: totalExpSeries.length ? totalExpSeries : [0], backgroundColor: '#38bdf8', borderRadius: 5 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('bucketChart').getContext('2d');
+      if (bucketChartInst) bucketChartInst.destroy();
+      bucketChartInst = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Räkningar', 'Kreditkort', 'Bolån', 'Buffert', 'Sparmål'],
+          datasets: [
+            {
+              label: 'Planerat (kr)',
+              data: [currentSums.rakningar.planned, currentSums.kredit.planned, currentSums.bolan.planned, currentSums.buffert.planned, currentSums.mal.planned],
+              backgroundColor: 'rgba(148, 163, 184, 0.45)',
+              borderRadius: 5
+            },
+            {
+              label: 'Utfall (kr)',
+              data: [currentSums.rakningar.actual, currentSums.kredit.actual, currentSums.bolan.actual, currentSums.buffert.actual, currentSums.mal.actual],
+              backgroundColor: ['#38bdf8', '#eab308', '#a855f7', '#22c55e', '#f472b6'],
+              borderRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: '#94a3b8' } } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          }
+        }
+      });
+    }
+
+    // --- SPARA LOKALT & TILL FIREBASE ---
+    async function saveAllMonths() {
+      localStorage.setItem('ekonomikollen_months', JSON.stringify(allMonthsData));
+      if (dbRef && currentUser) {
+        try {
+          await dbRef.set(allMonthsData);
+          document.getElementById('cloudSyncStatusText').style.color = 'var(--green)';
+          document.getElementById('cloudSyncStatusText').textContent = `Synkat med Firebase kl. ${new Date().toLocaleTimeString('sv-SE')}`;
+          alert('Sparat och krypterat synkat med Firebase!');
+        } catch (err) {
+          alert('Sparat lokalt, men Firebase nekade skrivning (kontrollera att din Gmail ligger i Rules): ' + err.message);
+        }
+      } else {
+        alert('Månaden sparad lokalt i webbläsaren! Logga in med Google för molnsynk.');
+      }
+      recalculateBudgetsAndCharts();
+    }
+
+    // --- FIREBASE AUTH & DB INIT ---
+    function initFirebase() {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+
+      firebase.auth().onAuthStateChanged(user => {
+        currentUser = user;
+        if (user) {
+          document.getElementById('authStatusBadge').innerHTML = `<span class="status-dot" style="background:var(--green);"></span>${user.email}`;
+          document.getElementById('googleLoginBtn').style.display = 'none';
+          document.getElementById('googleLogoutBtn').style.display = 'inline-block';
+
+          dbRef = firebase.database().ref('budget_privat');
+          dbRef.once('value').then(snap => {
+            const cloud = snap.val();
+            if (cloud && typeof cloud === 'object') {
+              allMonthsData = { ...allMonthsData, ...cloud };
+              localStorage.setItem('ekonomikollen_months', JSON.stringify(allMonthsData));
+              renderMonthTable();
+            }
+            document.getElementById('cloudSyncStatusText').style.color = 'var(--green)';
+            document.getElementById('cloudSyncStatusText').textContent = `Inloggad som ${user.email} • Molnsynk aktiv.`;
+          }).catch(err => {
+            document.getElementById('cloudSyncStatusText').style.color = 'var(--red)';
+            document.getElementById('cloudSyncStatusText').textContent = `Åtkomst nekad av databasregler (${err.message}). Kontrollera att ${user.email} är inlagd i Firebase Rules.`;
+          });
+        } else {
+          document.getElementById('authStatusBadge').innerHTML = `<span class="status-dot" style="background:var(--yellow);"></span>Ej inloggad (Lokal lagring)`;
+          document.getElementById('googleLoginBtn').style.display = 'inline-block';
+          document.getElementById('googleLogoutBtn').style.display = 'none';
+          dbRef = null;
+        }
+      });
+    }
+
+    // --- EVENT LISTENERS ---
+    document.getElementById('monthPicker').addEventListener('change', renderMonthTable);
+    document.getElementById('incSalary1').addEventListener('input', recalculateBudgetsAndCharts);
+    document.getElementById('incSalary2').addEventListener('input', recalculateBudgetsAndCharts);
+    document.getElementById('incOther').addEventListener('input', recalculateBudgetsAndCharts);
+    document.getElementById('kovLunchMode').addEventListener('change', renderMonthTable);
+
+    document.getElementById('addKovMemberBtn').addEventListener('click', () => {
+      const name = document.getElementById('kovNewName').value.trim() || 'Person';
+      const age = document.getElementById('kovNewAge').value;
+      kovMembers.push({ id: Date.now().toString(), name, age });
+      document.getElementById('kovNewName').value = '';
+      renderKovMembers();
+      renderMonthTable();
+    });
+
+    document.getElementById('applyKovToPlanBtn').addEventListener('click', () => {
+      const record = getMonthRecord(getCurrentMonthKey());
+      const kov = calculateKovTotals();
+      record.items.forEach(it => {
+        if (it.kovKey === 'food') it.planned = kov.foodSum + kov.shared.forbrukning;
+        if (it.kovKey === 'indiv') it.planned = kov.indivSum;
+        if (it.kovKey === 'el') it.planned = kov.shared.el;
+        if (it.kovKey === 'va') it.planned = kov.shared.va;
+        if (it.kovKey === 'media') it.planned = kov.shared.internetMobil + kov.shared.media;
+      });
+      renderMonthTable();
+    });
+
+    document.getElementById('addItemBtn').addEventListener('click', () => {
+      const name = document.getElementById('newItemName').value.trim();
+      const bucket = document.getElementById('newItemBucket').value;
+      if (!name) return;
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items.push({ id: Date.now().toString(), name, bucket, kovKey: null, planned: 0, actual: 0 });
+      document.getElementById('newItemName').value = '';
+      renderMonthTable();
+    });
+
+    document.getElementById('copyPrevMonthBtn').addEventListener('click', () => {
+      const cur = getCurrentMonthKey();
+      const keys = Object.keys(allMonthsData).filter(k => k < cur).sort();
+      if (!keys.length) {
+        alert('Det finns ingen tidigare sparad månad att kopiera ifrån ännu.');
+        return;
+      }
+      const prev = allMonthsData[keys[keys.length - 1]];
+      allMonthsData[cur] = {
+        income: { ...prev.income },
+        items: prev.items.map(it => ({ ...it, actual: 0 }))
+      };
+      renderMonthTable();
+    });
+
+    document.getElementById('saveMonthBtn').addEventListener('click', saveAllMonths);
+
+    document.getElementById('googleLoginBtn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).catch(err => alert('Inloggning misslyckades: ' + err.message));
+    });
+
+    document.getElementById('googleLogoutBtn').addEventListener('click', () => {
+      firebase.auth().signOut();
+    });
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      let csv = 'Manad;Post;Korg;Planerat;Utfall\n';
+      Object.keys(allMonthsData).sort().forEach(mk => {
+        (allMonthsData[mk].items || []).forEach(it => {
+          csv += `${mk};"${it.name}";${it.bucket};${it.planned};${it.actual}\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ekonomikollen_historik.csv';
+      a.click();
+    });
+
+    // Initiera vid sidladdning
+    getCurrentMonthKey();
+    renderKovMembers();
+    renderMonthTable();
+    initFirebase();
+  </script>
+</body>
+</html>
