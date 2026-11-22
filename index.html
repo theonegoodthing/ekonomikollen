@@ -158,16 +158,16 @@
 
     .pie-wrapper {
       position: relative;
-      height: 210px;
-      width: 100%;
-      margin: 6px 0;
+      height: 200px;
+      width: 200px;
+      margin: 10px auto;
     }
 
     .pie-legend-row {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      padding: 4px 0;
+      padding: 5px 0;
       border-top: 1px solid rgba(51, 65, 85, 0.6);
     }
 
@@ -468,7 +468,7 @@
         <div class="sub-value" style="margin-top:0;" id="pieSubtitle">Fördelning av månadens nettoinkomst</div>
       </div>
       <div class="pie-wrapper">
-        <canvas id="incomeExpensePieChart"></canvas>
+        <canvas id="incomeExpensePieChart" width="200" height="200"></canvas>
       </div>
       <div>
         <div class="pie-legend-row">
@@ -491,41 +491,41 @@
       <div class="card">
         <div class="card-title">Snitt Inkomster / mån</div>
         <div class="big-value" id="kpiAvgIncome" style="color: var(--green);">0 kr</div>
-        <div class="mom-diff" id="diffIncome" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="mom-diff" id="diffIncome" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="sub-value" id="kpiAvgIncomeSub">Alla inkomstkällor</div>
       </div>
 
       <div class="card">
         <div class="card-title">Snitt Matkostnad / mån</div>
         <div class="big-value" id="kpiAvgFood" style="color: var(--yellow);">0 kr</div>
-        <div class="mom-diff" id="diffFood" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="mom-diff" id="diffFood" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="sub-value" id="kpiAvgFoodSub">KOV 2027 rek: 8 300 kr/mån</div>
       </div>
 
       <div class="card">
         <div class="card-title">Snitt Drivmedel / mån</div>
         <div class="big-value" id="kpiAvgFuel" style="color: var(--accent);">0 kr</div>
-        <div class="mom-diff" id="diffFuel" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="mom-diff" id="diffFuel" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="sub-value" id="kpiAvgFuelSub">Baserat på sparade månader</div>
       </div>
 
       <div class="card">
         <div class="card-title">Snitt Utgifter / mån</div>
         <div class="big-value" id="kpiAvgExpense">0 kr</div>
-        <div class="mom-diff" id="diffExpense" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="mom-diff" id="diffExpense" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="sub-value" id="kpiAvgExpenseSub">Räkningar + Kreditkort + Bolån</div>
       </div>
 
       <div class="card">
         <div class="card-title">Snitt Sparkvot (Mål: 20%)</div>
         <div class="big-value" id="kpiAvgSavings" style="color: var(--green);">0 %</div>
-        <div class="mom-diff" id="diffSavings" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="mom-diff" id="diffSavings" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="sub-value" id="kpiAvgSavingsSub">Buffert (15%) + Mål (5%)</div>
       </div>
     </div>
   </div>
 
-  <!-- 2. MÅNADSVÄLJARE, INKOMSTER (MED DROPMENY) & NOLLBUDGET-MALL (80/20) -->
+  <!-- 2. MÅNADSVÄLJARE, INKOMSTER (ENDAST ETT STÄLLE) & NOLLBUDGET-MALL (80/20) -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
       <div>
@@ -544,7 +544,7 @@
       </div>
     </div>
 
-    <!-- Utfällbar Inkomstsektion -->
+    <!-- Utfällbar Inkomstsektion (enda stället för inkomster) -->
     <div class="income-panel">
       <div class="income-summary-bar" id="toggleIncomeDrawerBtn">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -553,7 +553,7 @@
             <div style="font-weight:700; font-size:0.95rem;">
               Inkomster & Intäkter <span class="subcount-badge" id="incomeCountBadge">4 poster</span>
             </div>
-            <div class="sub-value" style="margin-top:2px;">Klicka för att fälla in/ut och lägga till löner, barnbidrag, hyresintäkt m.m.</div>
+            <div class="sub-value" style="margin-top:2px;">Klicka för att fälla in/ut och ändra löner, barnbidrag eller hyresintäkt.</div>
           </div>
         </div>
         <div style="text-align:right;">
@@ -578,7 +578,7 @@
       <div class="bucket-box">
         <div class="bucket-header">
           <span style="color:var(--accent);">Räkningar (30%)</span>
-          <span id="targetRakningar" title="30 % av denna månads totala inkomst">Mål (30%): 0 kr</span>
+          <span id="targetRakningar">Mål (30%): 0 kr</span>
         </div>
         <div style="font-size:1.1rem; font-weight:700;" id="actualRakningar">Utfall: 0 kr</div>
         <div class="progress-bg"><div class="progress-fill" id="barRakningar" style="width:0%; background:var(--accent);"></div></div>
@@ -588,7 +588,7 @@
       <div class="bucket-box">
         <div class="bucket-header">
           <span style="color:var(--yellow);">Kreditkort (30%)</span>
-          <span id="targetKredit" title="30 % av denna månads totala inkomst">Mål (30%): 0 kr</span>
+          <span id="targetKredit">Mål (30%): 0 kr</span>
         </div>
         <div style="font-size:1.1rem; font-weight:700;" id="actualKredit">Utfall: 0 kr</div>
         <div class="progress-bg"><div class="progress-fill" id="barKredit" style="width:0%; background:var(--yellow);"></div></div>
@@ -598,7 +598,7 @@
       <div class="bucket-box">
         <div class="bucket-header">
           <span style="color:var(--purple);">Bolån (20%)</span>
-          <span id="targetBolan" title="20 % av denna månads totala inkomst">Mål (20%): 0 kr</span>
+          <span id="targetBolan">Mål (20%): 0 kr</span>
         </div>
         <div style="font-size:1.1rem; font-weight:700;" id="actualBolan">Utfall: 0 kr</div>
         <div class="progress-bg"><div class="progress-fill" id="barBolan" style="width:0%; background:var(--purple);"></div></div>
@@ -608,7 +608,7 @@
       <div class="bucket-box">
         <div class="bucket-header">
           <span style="color:var(--green);">Buffert (15%)</span>
-          <span id="targetBuffert" title="15 % av denna månads totala inkomst">Mål (15%): 0 kr</span>
+          <span id="targetBuffert">Mål (15%): 0 kr</span>
         </div>
         <div style="font-size:1.1rem; font-weight:700;" id="actualBuffert">Utfall: 0 kr</div>
         <div class="progress-bg"><div class="progress-fill" id="barBuffert" style="width:0%; background:var(--green);"></div></div>
@@ -618,127 +618,7 @@
       <div class="bucket-box">
         <div class="bucket-header">
           <span style="color:#f472b6;">Sparmål (5%)</span>
-          <span id="targetMal" title="5 % av denna månads totala inkomst">Mål (5%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualMal">Utfall: 0 kr</div>
-        <div class="progress-bg"><div class="progress-fill" id="barMal" style="width:0%; background:#f472b6;"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planMalText">Planerat: 0 kr</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. BUDGETPOSTER: PLANERING VS UTFALL (MED UTFÄLLBARA FAKTUROR PÅ VARJE RAD) -->
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div>
-        <div class="card-title" style="margin-bottom:2px;">Månadens Poster – Planering vs. Faktiskt Utfall</div>
-        <div class="sub-value" style="margin-top:0;">Klicka på en pos0 kr</div>
-      <div class="sub-value" id="kpiAvgFuelSub">Baserat på sparade månader</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Snitt Utgifter / mån</div>
-      <div class="big-value" id="kpiAvgExpense">0 kr</div>
-      <div class="sub-value" id="kpiAvgExpenseSub">Räkningar + Kreditkort + Bolån</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Snitt Sparkvot (Mål: 20%)</div>
-      <div class="big-value" id="kpiAvgSavings" style="color: var(--green);">0 %</div>
-      <div class="sub-value" id="kpiAvgSavingsSub">Buffert (15%) + Mål (5%)</div>
-    </div>
-  </div>
-
-  <!-- 2. MÅNADSVÄLJARE, INKOMSTER (MED DROPMENY) & NOLLBUDGET-MALL (80/20) -->
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-      <div>
-        <div class="card-title" style="margin-bottom:2px;">Aktuell budgetmånad & Nollbudget (80/20-modellen)</div>
-        <div class="sub-value" style="margin-top:0;">Varje krona av inkomsten fördelas till 0 kr kvar.</div>
-      </div>
-      <div class="row-flex">
-        <label style="min-width:165px;">
-          Välj månad
-          <input type="month" id="monthPicker" />
-        </label>
-        <button class="btn btn-secondary" id="copyPrevMonthBtn" type="button" title="Kopiera planering & fasta poster från föregående månad">📋 Kopiera förra månaden</button>
-        <button class="btn btn-green" id="saveMonthBtn" type="button">💾 Spara månad</button>
-      </div>
-    </div>
-
-    <!-- Utfällbar Inkomstsektion -->
-    <div class="income-panel">
-      <div class="income-summary-bar" id="toggleIncomeDrawerBtn">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="chevron open" id="incomeChevron">▶</span>
-          <div>
-            <div style="font-weight:700; font-size:0.95rem;">
-              Inkomster & Intäkter <span class="subcount-badge" id="incomeCountBadge">4 poster</span>
-            </div>
-            <div class="sub-value" style="margin-top:2px;">Klicka för att fälla in/ut och lägga till löner, barnbidrag, hyresintäkt m.m.</div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div class="card-title" style="margin-bottom:2px;">Total Nettoinkomst</div>
-          <div style="font-size:1.45rem; font-weight:700; color:var(--green);" id="totalIncomeDisplay">0 kr</div>
-          <div class="sub-value" style="margin-top:0;" id="zeroBudgetStatus">Nollbudget-saldo: 0 kr kvar</div>
-        </div>
-      </div>
-
-      <div class="income-drawer" id="incomeDrawerBody">
-        <div id="incomeRowsContainer"></div>
-        <div class="row-flex" style="margin-top:10px;">
-          <input type="text" id="newIncomeName" placeholder="Ny inkomst (t.ex. Hyresintäkt / VAB / Bonus)" style="max-width:280px;" />
-          <input type="number" id="newIncomeAmount" placeholder="Belopp (kr)" step="100" style="max-width:140px;" />
-          <button class="btn btn-secondary btn-xs" id="addIncomeBtn" type="button" style="padding:8px 12px;">+ Lägg till inkomst</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bankens 5 korgar: 80% Bankkonto (30/30/20) + 20% Sparkonto (15/5) -->
-    <div class="bucket-grid">
-      <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--accent);">Räkningar (30%)</span>
-          <span id="targetRakningar">Mål: 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualRakningar">Utfall: 0 kr</div>
-        <div class="progress-bg"><div class="progress-fill" id="barRakningar" style="width:0%; background:var(--accent);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planRakningarText">Planerat: 0 kr</div>
-      </div>
-
-      <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--yellow);">Kreditkort (30%)</span>
-          <span id="targetKredit">Mål: 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualKredit">Utfall: 0 kr</div>
-        <div class="progress-bg"><div class="progress-fill" id="barKredit" style="width:0%; background:var(--yellow);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planKreditText">Planerat: 0 kr</div>
-      </div>
-
-      <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--purple);">Bolån (20%)</span>
-          <span id="targetBolan">Mål: 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualBolan">Utfall: 0 kr</div>
-        <div class="progress-bg"><div class="progress-fill" id="barBolan" style="width:0%; background:var(--purple);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBolanText">Planerat: 0 kr</div>
-      </div>
-
-      <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--green);">Buffert (15%)</span>
-          <span id="targetBuffert">Mål: 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualBuffert">Utfall: 0 kr</div>
-        <div class="progress-bg"><div class="progress-fill" id="barBuffert" style="width:0%; background:var(--green);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBuffertText">Planerat: 0 kr</div>
-      </div>
-
-      <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:#f472b6;">Sparmål (5%)</span>
-          <span id="targetMal">Mål: 0 kr</span>
+          <span id="targetMal">Mål (5%): 0 kr</span>
         </div>
         <div style="font-size:1.1rem; font-weight:700;" id="actualMal">Utfall: 0 kr</div>
         <div class="progress-bg"><div class="progress-fill" id="barMal" style="width:0%; background:#f472b6;"></div></div>
@@ -921,6 +801,7 @@
     let incomeDrawerOpen = true;
     let currentUser = null;
     let dbRef = null;
+    let pieChartInst = null;
     let trendChartInst = null;
     let bucketChartInst = null;
 
@@ -1016,7 +897,6 @@
       }
       const rec = allMonthsData[monthKey];
 
-      // Migrera äldre format (salary1/salary2/other) till dynamisk incomeList om det behövs
       if (!Array.isArray(rec.incomeList)) {
         const old = rec.income || {};
         rec.incomeList = [
@@ -1024,9 +904,9 @@
           { id: 'inc2', name: 'Lön 2 (netto)', amount: Number(old.salary2) || 0 },
           { id: 'inc3', name: 'Barnbidrag & Övrigt', amount: Number(old.other) || 0 }
         ];
+        delete rec.income;
       }
 
-      // Säkerställ att alla poster har en subItems-array och korrekt utfallssumma
       (rec.items || []).forEach(it => {
         if (!Array.isArray(it.subItems)) it.subItems = [];
         if (it.subItems.length > 0) {
@@ -1037,7 +917,7 @@
       return rec;
     }
 
-    // --- RENDERA INKOMSTER (DROPMENY) ---
+    // --- RENDERA INKOMSTER (ENDAST ETT STÄLLE) ---
     function renderIncomeList() {
       const record = getMonthRecord(getCurrentMonthKey());
       const container = document.getElementById('incomeRowsContainer');
@@ -1045,8 +925,8 @@
 
       container.innerHTML = record.incomeList.map((inc, idx) => `
         <div class="income-row-item">
-          <input type="text" value="${inc.name}" style="flex:1; min-width:190px; max-width:300px;" onchange="updateIncomeRow(${idx}, 'name', this.value)" />
-          <input type="number" value="${inc.amount}" step="100" style="max-width:140px;" onchange="updateIncomeRow(${idx}, 'amount', this.value)" />
+          <input type="text" value="${inc.name}" style="flex:1; min-width:190px; max-width:300px;" oninput="updateIncomeRow(${idx}, 'name', this.value)" />
+          <input type="number" value="${inc.amount}" step="100" style="max-width:140px;" oninput="updateIncomeRow(${idx}, 'amount', this.value)" />
           <span style="color:var(--muted); font-size:0.85rem;">kr</span>
           <button class="btn btn-danger" type="button" onclick="deleteIncomeRow(${idx})" title="Ta bort inkomst">✕</button>
         </div>
@@ -1130,7 +1010,6 @@
         `;
         tbody.appendChild(tr);
 
-        // Utfälld dropmeny med specifika fakturor för denna post
         if (isExpanded) {
           const subTr = document.createElement('tr');
           subTr.className = 'subitems-drawer-row';
@@ -1222,6 +1101,44 @@
       return (rec.income?.salary1 || 0) + (rec.income?.salary2 || 0) + (rec.income?.other || 0);
     }
 
+    function getMonthMetrics(rec) {
+      let food = 0, fuel = 0, exp = 0, sav = 0;
+      const inc = getRecordTotalIncome(rec);
+
+      (rec.items || []).forEach(it => {
+        const val = Number(it.actual) || 0;
+        const lower = it.name.toLowerCase();
+        if (lower.includes('mat') || lower.includes('ica')) food += val;
+        if (lower.includes('drivmedel') || lower.includes('bensin') || lower.includes('bil')) fuel += val;
+        if (it.bucket === 'buffert' || it.bucket === 'mal') sav += val;
+        else exp += val;
+      });
+
+      const savPct = inc > 0 ? (sav / inc) * 100 : 0;
+      return { inc, food, fuel, exp, sav, savPct };
+    }
+
+    function formatMomBadge(elId, diffVal, prevMonthKey, unit = 'kr', lowerIsBetter = true) {
+      const el = document.getElementById(elId);
+      if (!prevMonthKey) {
+        el.style.color = 'var(--muted)';
+        el.textContent = 'Ingen föreg. månad';
+        return;
+      }
+      if (Math.abs(diffVal) < 0.05) {
+        el.style.color = 'var(--muted)';
+        el.textContent = `0 ${unit} mot ${prevMonthKey}`;
+        return;
+      }
+      const isPositive = diffVal > 0;
+      const isGood = lowerIsBetter ? !isPositive : isPositive;
+      el.style.color = isGood ? 'var(--green)' : 'var(--red)';
+      const formatted = unit === '%'
+        ? `${isPositive ? '+' : ''}${diffVal.toFixed(1).replace('.', ',')} %`
+        : `${isPositive ? '+' : ''}${Math.round(diffVal).toLocaleString('sv-SE')} kr`;
+      el.textContent = `${formatted} mot ${prevMonthKey}`;
+    }
+
     function recalculateBudgetsAndCharts() {
       const monthKey = getCurrentMonthKey();
       const record = getMonthRecord(monthKey);
@@ -1260,30 +1177,93 @@
       }
 
       const mapKeys = [
-        { key: 'rakningar', cap: 'Rakningar' },
-        { key: 'kredit', cap: 'Kredit' },
-        { key: 'bolan', cap: 'Bolan' },
-        { key: 'buffert', cap: 'Buffert' },
-        { key: 'mal', cap: 'Mal' }
+        { key: 'rakningar', cap: 'Rakningar', pctLabel: '30%' },
+        { key: 'kredit', cap: 'Kredit', pctLabel: '30%' },
+        { key: 'bolan', cap: 'Bolan', pctLabel: '20%' },
+        { key: 'buffert', cap: 'Buffert', pctLabel: '15%' },
+        { key: 'mal', cap: 'Mal', pctLabel: '5%' }
       ];
 
-      mapKeys.forEach(({ key, cap }) => {
+      mapKeys.forEach(({ key, cap, pctLabel }) => {
         const target = Math.round(totalInc * sums[key].pct);
         const actual = sums[key].actual;
         const planned = sums[key].planned;
         const pctFill = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 0;
 
-        document.getElementById(`target${cap}`).textContent = `Mål: ${target.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`target${cap}`).textContent = `Mål (${pctLabel}): ${target.toLocaleString('sv-SE')} kr`;
         document.getElementById(`actual${cap}`).textContent = `Utfall: ${actual.toLocaleString('sv-SE')} kr`;
         document.getElementById(`plan${cap}Text`).textContent = `Planerat: ${planned.toLocaleString('sv-SE')} kr`;
         document.getElementById(`bar${cap}`).style.width = `${pctFill}%`;
       });
 
+      renderTopPieChart(totalInc, sums);
       updateHistoricalKpisAndCharts(sums);
     }
 
+    // --- TÅRTDIAGRAM: INKOMSTER VS UTGIFTER I PROCENT ---
+    function renderTopPieChart(totalInc, sums) {
+      const monthKey = getCurrentMonthKey();
+      const totalExpenses = sums.rakningar.actual + sums.kredit.actual + sums.bolan.actual;
+      const totalSavings = sums.buffert.actual + sums.mal.actual;
+      const remaining = Math.max(0, totalInc - totalExpenses - totalSavings);
+
+      const base = totalInc > 0 ? totalInc : (totalExpenses + totalSavings || 1);
+      const expPct = totalInc > 0 ? ((totalExpenses / base) * 100).toFixed(1) : '0.0';
+      const savPct = totalInc > 0 ? ((totalSavings / base) * 100).toFixed(1) : '0.0';
+      const remPct = totalInc > 0 ? ((remaining / base) * 100).toFixed(1) : '0.0';
+
+      document.getElementById('pieSubtitle').textContent = `${monthKey} • Nettoinkomst: ${totalInc.toLocaleString('sv-SE')} kr`;
+      document.getElementById('pieExpensePct').textContent = `${expPct.replace('.', ',')} % (${totalExpenses.toLocaleString('sv-SE')} kr)`;
+      document.getElementById('pieSavingsPct').textContent = `${savPct.replace('.', ',')} % (${totalSavings.toLocaleString('sv-SE')} kr)`;
+      document.getElementById('pieRemainingPct').textContent = `${remPct.replace('.', ',')} % (${remaining.toLocaleString('sv-SE')} kr)`;
+
+      const canvas = document.getElementById('incomeExpensePieChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (pieChartInst) {
+        pieChartInst.destroy();
+        pieChartInst = null;
+      }
+
+      const hasValues = totalExpenses > 0 || totalSavings > 0 || remaining > 0;
+
+      pieChartInst = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Totala utgifter', 'Sparande (Buffert + Mål)', 'Kvar av inkomst'],
+          datasets: [{
+            data: hasValues ? [totalExpenses, totalSavings, remaining] : [1],
+            backgroundColor: hasValues ? ['#ef4444', '#22c55e', '#38bdf8'] : ['#334155'],
+            borderColor: '#1e293b',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: false,
+          animation: false,
+          cutout: '60%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  if (!hasValues || totalInc <= 0) return 'Fyll i inkomst & utfall för att se fördelning';
+                  const val = ctx.parsed;
+                  const pct = ((val / totalInc) * 100).toFixed(1).replace('.', ',');
+                  return `${ctx.label}: ${pct} % (${val.toLocaleString('sv-SE')} kr)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
     function updateHistoricalKpisAndCharts(currentSums) {
+      const curKey = getCurrentMonthKey();
       const monthKeys = Object.keys(allMonthsData).sort();
+
+      let incTotal = 0, incMonths = 0;
       let foodTotal = 0, foodMonths = 0;
       let fuelTotal = 0, fuelMonths = 0;
       let expTotal = 0, expMonths = 0;
@@ -1297,44 +1277,54 @@
         const rec = allMonthsData[mk];
         if (!rec || !rec.items) return;
 
-        let mFood = 0, mFuel = 0, mExp = 0, mSav = 0;
-        const mInc = getRecordTotalIncome(rec);
-
-        rec.items.forEach(it => {
-          const val = Number(it.actual) || 0;
-          const lower = it.name.toLowerCase();
-          if (lower.includes('mat') || lower.includes('ica')) mFood += val;
-          if (lower.includes('drivmedel') || lower.includes('bensin') || lower.includes('bil')) mFuel += val;
-          if (it.bucket === 'buffert' || it.bucket === 'mal') mSav += val;
-          else mExp += val;
-        });
-
-        if (mFood > 0) { foodTotal += mFood; foodMonths++; }
-        if (mFuel > 0) { fuelTotal += mFuel; fuelMonths++; }
-        if (mExp > 0) {
-          expTotal += mExp;
+        const m = getMonthMetrics(rec);
+        if (m.inc > 0) { incTotal += m.inc; incMonths++; }
+        if (m.food > 0) { foodTotal += m.food; foodMonths++; }
+        if (m.fuel > 0) { fuelTotal += m.fuel; fuelMonths++; }
+        if (m.exp > 0) {
+          expTotal += m.exp;
           expMonths++;
           labels.push(mk);
-          foodSeries.push(mFood);
-          totalExpSeries.push(mExp);
+          foodSeries.push(m.food);
+          totalExpSeries.push(m.exp);
         }
-        if (mInc > 0 && (mSav > 0 || mExp > 0)) {
-          savPctSum += (mSav / mInc) * 100;
+        if (m.inc > 0 && (m.sav > 0 || m.exp > 0)) {
+          savPctSum += m.savPct;
           savMonths++;
         }
       });
 
+      document.getElementById('kpiAvgIncome').textContent = incMonths > 0 ? `${Math.round(incTotal / incMonths).toLocaleString('sv-SE')} kr` : '0 kr';
       document.getElementById('kpiAvgFood').textContent = foodMonths > 0 ? `${Math.round(foodTotal / foodMonths).toLocaleString('sv-SE')} kr` : '0 kr';
       document.getElementById('kpiAvgFuel').textContent = fuelMonths > 0 ? `${Math.round(fuelTotal / fuelMonths).toLocaleString('sv-SE')} kr` : '0 kr';
       document.getElementById('kpiAvgExpense').textContent = expMonths > 0 ? `${Math.round(expTotal / expMonths).toLocaleString('sv-SE')} kr` : '0 kr';
       document.getElementById('kpiAvgSavings').textContent = savMonths > 0 ? `${(savPctSum / savMonths).toFixed(1).replace('.', ',')} %` : '0 %';
+
+      const prevKeys = monthKeys.filter(k => k < curKey).sort();
+      const prevKey = prevKeys.length > 0 ? prevKeys[prevKeys.length - 1] : null;
+      const curM = getMonthMetrics(getMonthRecord(curKey));
+
+      if (prevKey) {
+        const prevM = getMonthMetrics(getMonthRecord(prevKey));
+        formatMomBadge('diffIncome', curM.inc - prevM.inc, prevKey, 'kr', false);
+        formatMomBadge('diffFood', curM.food - prevM.food, prevKey, 'kr', true);
+        formatMomBadge('diffFuel', curM.fuel - prevM.fuel, prevKey, 'kr', true);
+        formatMomBadge('diffExpense', curM.exp - prevM.exp, prevKey, 'kr', true);
+        formatMomBadge('diffSavings', curM.savPct - prevM.savPct, prevKey, '%', false);
+      } else {
+        formatMomBadge('diffIncome', 0, null);
+        formatMomBadge('diffFood', 0, null);
+        formatMomBadge('diffFuel', 0, null);
+        formatMomBadge('diffExpense', 0, null);
+        formatMomBadge('diffSavings', 0, null);
+      }
 
       const ctx1 = document.getElementById('trendChart').getContext('2d');
       if (trendChartInst) trendChartInst.destroy();
       trendChartInst = new Chart(ctx1, {
         type: 'bar',
         data: {
-          labels: labels.length ? labels : [getCurrentMonthKey()],
+          labels: labels.length ? labels : [curKey],
           datasets: [
             { label: 'Matkostnad (kr)', data: foodSeries.length ? foodSeries : [0], backgroundColor: '#eab308', borderRadius: 5 },
             { label: 'Totala utgifter (kr)', data: totalExpSeries.length ? totalExpSeries : [0], backgroundColor: '#38bdf8', borderRadius: 5 }
@@ -1384,7 +1374,7 @@
       });
     }
 
-    // --- SPARA LOKALT & TILL FIREBASE ---
+    // --- EN ENDA SPARA-FUNKTION (LOKALT + FIREBASE) ---
     async function saveAllMonths() {
       localStorage.setItem('ekonomikollen_months', JSON.stringify(allMonthsData));
       if (dbRef && currentUser) {
