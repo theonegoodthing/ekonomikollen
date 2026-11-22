@@ -285,12 +285,21 @@
       padding: 12px;
     }
 
-    .bucket-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
+    .bucket-title {
+      font-size: 0.88rem;
       font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .bucket-max-goal {
+      font-size: 0.78rem;
+      color: var(--muted);
       margin-bottom: 6px;
+    }
+
+    .bucket-actual-val {
+      font-size: 1.08rem;
+      font-weight: 700;
     }
 
     .progress-bg {
@@ -595,53 +604,43 @@
     <!-- Bankens 5 korgar: 80% Bankkonto (30/30/20) + 20% Sparkonto (15/5) -->
     <div class="bucket-grid">
       <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--accent);">Räkningar (30%)</span>
-          <span id="targetRakningar">Mål (30%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualRakningar">Utfall: 0 kr</div>
+        <div class="bucket-title" style="color:var(--accent);">Räkningar (mål 30%)</div>
+        <div class="bucket-max-goal" id="targetRakningar">Max summa mål: 0 kr</div>
+        <div class="bucket-actual-val" id="actualRakningar">Utfall: 0 kr (0 %)</div>
         <div class="progress-bg"><div class="progress-fill" id="barRakningar" style="width:0%; background:var(--accent);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planRakningarText">Planerat: 0 kr</div>
+        <div class="sub-value" style="margin-top:0; font-size:0.76rem;" id="planRakningarText">Budget: 0 kr</div>
       </div>
 
       <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--yellow);">Kreditkort (30%)</span>
-          <span id="targetKredit">Mål (30%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualKredit">Utfall: 0 kr</div>
+        <div class="bucket-title" style="color:var(--yellow);">Kreditkort (mål 30%)</div>
+        <div class="bucket-max-goal" id="targetKredit">Max summa mål: 0 kr</div>
+        <div class="bucket-actual-val" id="actualKredit">Utfall: 0 kr (0 %)</div>
         <div class="progress-bg"><div class="progress-fill" id="barKredit" style="width:0%; background:var(--yellow);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planKreditText">Planerat: 0 kr</div>
+        <div class="sub-value" style="margin-top:0; font-size:0.76rem;" id="planKreditText">Budget: 0 kr</div>
       </div>
 
       <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--purple);">Bolån (20%)</span>
-          <span id="targetBolan">Mål (20%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualBolan">Utfall: 0 kr</div>
+        <div class="bucket-title" style="color:var(--purple);">Bolån (mål 20%)</div>
+        <div class="bucket-max-goal" id="targetBolan">Max summa mål: 0 kr</div>
+        <div class="bucket-actual-val" id="actualBolan">Utfall: 0 kr (0 %)</div>
         <div class="progress-bg"><div class="progress-fill" id="barBolan" style="width:0%; background:var(--purple);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBolanText">Planerat: 0 kr</div>
+        <div class="sub-value" style="margin-top:0; font-size:0.76rem;" id="planBolanText">Budget: 0 kr</div>
       </div>
 
       <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:var(--green);">Buffert (15%)</span>
-          <span id="targetBuffert">Mål (15%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualBuffert">Utfall: 0 kr</div>
+        <div class="bucket-title" style="color:var(--green);">Buffert (mål 15%)</div>
+        <div class="bucket-max-goal" id="targetBuffert">Max summa mål: 0 kr</div>
+        <div class="bucket-actual-val" id="actualBuffert">Utfall: 0 kr (0 %)</div>
         <div class="progress-bg"><div class="progress-fill" id="barBuffert" style="width:0%; background:var(--green);"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBuffertText">Planerat: 0 kr</div>
+        <div class="sub-value" style="margin-top:0; font-size:0.76rem;" id="planBuffertText">Budget: 0 kr</div>
       </div>
 
       <div class="bucket-box">
-        <div class="bucket-header">
-          <span style="color:#f472b6;">Sparmål (5%)</span>
-          <span id="targetMal">Mål (5%): 0 kr</span>
-        </div>
-        <div style="font-size:1.1rem; font-weight:700;" id="actualMal">Utfall: 0 kr</div>
+        <div class="bucket-title" style="color:#f472b6;">Sparmål (mål 5%)</div>
+        <div class="bucket-max-goal" id="targetMal">Max summa mål: 0 kr</div>
+        <div class="bucket-actual-val" id="actualMal">Utfall: 0 kr (0 %)</div>
         <div class="progress-bg"><div class="progress-fill" id="barMal" style="width:0%; background:#f472b6;"></div></div>
-        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planMalText">Planerat: 0 kr</div>
+        <div class="sub-value" style="margin-top:0; font-size:0.76rem;" id="planMalText">Budget: 0 kr</div>
       </div>
     </div>
   </div>
@@ -1196,22 +1195,23 @@
       }
 
       const mapKeys = [
-        { key: 'rakningar', cap: 'Rakningar', pctLabel: '30%' },
-        { key: 'kredit', cap: 'Kredit', pctLabel: '30%' },
-        { key: 'bolan', cap: 'Bolan', pctLabel: '20%' },
-        { key: 'buffert', cap: 'Buffert', pctLabel: '15%' },
-        { key: 'mal', cap: 'Mal', pctLabel: '5%' }
+        { key: 'rakningar', cap: 'Rakningar' },
+        { key: 'kredit', cap: 'Kredit' },
+        { key: 'bolan', cap: 'Bolan' },
+        { key: 'buffert', cap: 'Buffert' },
+        { key: 'mal', cap: 'Mal' }
       ];
 
-      mapKeys.forEach(({ key, cap, pctLabel }) => {
+      mapKeys.forEach(({ key, cap }) => {
         const target = Math.round(totalInc * sums[key].pct);
         const actual = sums[key].actual;
         const planned = sums[key].planned;
         const pctFill = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 0;
+        const actualOfIncomePct = totalInc > 0 ? ((actual / totalInc) * 100).toFixed(1).replace('.', ',') : '0,0';
 
-        document.getElementById(`target${cap}`).textContent = `Mål (${pctLabel}): ${target.toLocaleString('sv-SE')} kr`;
-        document.getElementById(`actual${cap}`).textContent = `Utfall: ${actual.toLocaleString('sv-SE')} kr`;
-        document.getElementById(`plan${cap}Text`).textContent = `Planerat: ${planned.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`target${cap}`).textContent = `Max summa mål: ${target.toLocaleString('sv-SE')} kr`;
+        document.getElementById(`actual${cap}`).textContent = `Utfall: ${actual.toLocaleString('sv-SE')} kr (${actualOfIncomePct} %)`;
+        document.getElementById(`plan${cap}Text`).textContent = `Budget: ${planned.toLocaleString('sv-SE')} kr`;
         document.getElementById(`bar${cap}`).style.width = `${pctFill}%`;
       });
 
