@@ -72,7 +72,7 @@
     /* Övre översikt: Tårtdiagram till vänster + 5 KPI-kort till höger */
     .top-overview-grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 350px 1fr;
       gap: 18px;
       margin-bottom: 22px;
       align-items: stretch;
@@ -158,8 +158,8 @@
 
     .pie-wrapper {
       position: relative;
-      height: 200px;
-      width: 200px;
+      height: 210px;
+      width: 210px;
       margin: 10px auto;
     }
 
@@ -169,6 +169,21 @@
       font-size: 0.8rem;
       padding: 5px 0;
       border-top: 1px solid rgba(51, 65, 85, 0.6);
+    }
+
+    .target-split-banner {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
+    .target-split-banner strong {
+      color: var(--text);
     }
 
     .btn {
@@ -466,21 +481,25 @@
       <div>
         <div class="card-title" style="margin-bottom:2px;">Inkomst vs. Utgifter (%)</div>
         <div class="sub-value" style="margin-top:0;" id="pieSubtitle">Fördelning av månadens nettoinkomst</div>
+        <div class="target-split-banner">
+          <strong>Önskad fördelning (80/20):</strong><br/>
+          Bankkonto 80% (30% Räkningar, 30% Kredit, 20% Bolån) • Sparkonto 20% (15% Buffert, 5% Mål)
+        </div>
       </div>
       <div class="pie-wrapper">
-        <canvas id="incomeExpensePieChart" width="200" height="200"></canvas>
+        <canvas id="incomeExpensePieChart" width="210" height="210"></canvas>
       </div>
       <div>
         <div class="pie-legend-row">
-          <span style="color:var(--red);">● Totala utgifter</span>
+          <span style="color:var(--red);">● Totala utgifter (Mål 80%)</span>
           <strong id="pieExpensePct">0 % (0 kr)</strong>
         </div>
         <div class="pie-legend-row">
-          <span style="color:var(--green);">● Sparande (Buffert & Mål)</span>
+          <span style="color:var(--green);">● Sparande (Mål 20%)</span>
           <strong id="pieSavingsPct">0 % (0 kr)</strong>
         </div>
         <div class="pie-legend-row">
-          <span style="color:var(--accent);">● Kvar av inkomst</span>
+          <span id="pieRemainingDot" style="color:var(--accent);">● Kvar av inkomst</span>
           <strong id="pieRemainingPct">0 % (0 kr)</strong>
         </div>
       </div>
@@ -531,7 +550,7 @@
       <div>
         <div class="card-title" style="margin-bottom:2px;">Aktuell budgetmånad & Nollbudget (80/20-modellen)</div>
         <div class="sub-value" style="margin-top:0;">
-          Varje krona av inkomsten fördelas till 0 kr kvar. <strong>Målbeloppen i varje korg räknas ut i procent av just den här månadens totala nettoinkomst och varierar därför månad för månad.</strong>
+          Önskad fördelning: <strong>Bankkonto 80% (30% Räkningar, 30% Kredit, 20% Bolån)</strong> & <strong>Sparkonto 20% (15% Buffert, 5% Mål)</strong>. Målbeloppen beräknas utifrån den valda månadens totala nettoinkomst och varierar därför månad för månad.
         </div>
       </div>
       <div class="row-flex">
@@ -544,7 +563,7 @@
       </div>
     </div>
 
-    <!-- Utfällbar Inkomstsektion (enda stället för inkomster) -->
+    <!-- Utfällbar Inkomstsektion -->
     <div class="income-panel">
       <div class="income-summary-bar" id="toggleIncomeDrawerBtn">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -1200,22 +1219,62 @@
       updateHistoricalKpisAndCharts(sums);
     }
 
-    // --- TÅRTDIAGRAM: INKOMSTER VS UTGIFTER I PROCENT ---
+    // Plugin som ritar ut procenttal direkt i tårtdiagrammets cirkel-segment
+    const piePercentageLabelsPlugin = {
+      id: 'piePercentageLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+        const totalIncome = chart.config.options.plugins.piePercentageLabels?.totalIncome || 0;
+        const hasValues = chart.config.options.plugins.piePercentageLabels?.hasValues || false;
+
+        if (!hasValues || totalIncome <= 0 || !meta || !meta.data) return;
+
+        ctx.save();
+        ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        meta.data.forEach((arc, index) => {
+          const val = chart.data.datasets[0].data[index] || 0;
+          const pct = (val / totalIncome) * 100;
+          if (pct >= 6) {
+            const pos = arc.tooltipPosition();
+            ctx.fillText(`${pct.toFixed(1).replace('.', ',')}%`, pos.x, pos.y);
+          }
+        });
+        ctx.restore();
+      }
+    };
+
+    // --- TÅRTDIAGRAM: INKOMSTER VS UTGIFTER I PROCENT (MED MINUS PÅ KVAR AV INKOMST) ---
     function renderTopPieChart(totalInc, sums) {
       const monthKey = getCurrentMonthKey();
       const totalExpenses = sums.rakningar.actual + sums.kredit.actual + sums.bolan.actual;
       const totalSavings = sums.buffert.actual + sums.mal.actual;
-      const remaining = Math.max(0, totalInc - totalExpenses - totalSavings);
+      const remainingRaw = totalInc - totalExpenses - totalSavings;
+      const remainingPositive = Math.max(0, remainingRaw);
 
       const base = totalInc > 0 ? totalInc : (totalExpenses + totalSavings || 1);
       const expPct = totalInc > 0 ? ((totalExpenses / base) * 100).toFixed(1) : '0.0';
       const savPct = totalInc > 0 ? ((totalSavings / base) * 100).toFixed(1) : '0.0';
-      const remPct = totalInc > 0 ? ((remaining / base) * 100).toFixed(1) : '0.0';
+      const remPct = totalInc > 0 ? ((remainingRaw / base) * 100).toFixed(1) : '0.0';
 
       document.getElementById('pieSubtitle').textContent = `${monthKey} • Nettoinkomst: ${totalInc.toLocaleString('sv-SE')} kr`;
       document.getElementById('pieExpensePct').textContent = `${expPct.replace('.', ',')} % (${totalExpenses.toLocaleString('sv-SE')} kr)`;
       document.getElementById('pieSavingsPct').textContent = `${savPct.replace('.', ',')} % (${totalSavings.toLocaleString('sv-SE')} kr)`;
-      document.getElementById('pieRemainingPct').textContent = `${remPct.replace('.', ',')} % (${remaining.toLocaleString('sv-SE')} kr)`;
+
+      const remDotEl = document.getElementById('pieRemainingDot');
+      const remPctEl = document.getElementById('pieRemainingPct');
+      remPctEl.textContent = `${remPct.replace('.', ',')} % (${remainingRaw.toLocaleString('sv-SE')} kr)`;
+      if (remainingRaw < 0) {
+        remDotEl.style.color = 'var(--red)';
+        remPctEl.style.color = 'var(--red)';
+      } else {
+        remDotEl.style.color = 'var(--accent)';
+        remPctEl.style.color = 'var(--text)';
+      }
 
       const canvas = document.getElementById('incomeExpensePieChart');
       if (!canvas) return;
@@ -1225,24 +1284,26 @@
         pieChartInst = null;
       }
 
-      const hasValues = totalExpenses > 0 || totalSavings > 0 || remaining > 0;
+      const hasValues = totalExpenses > 0 || totalSavings > 0 || remainingPositive > 0;
 
       pieChartInst = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Totala utgifter', 'Sparande (Buffert + Mål)', 'Kvar av inkomst'],
           datasets: [{
-            data: hasValues ? [totalExpenses, totalSavings, remaining] : [1],
+            data: hasValues ? [totalExpenses, totalSavings, remainingPositive] : [1],
             backgroundColor: hasValues ? ['#ef4444', '#22c55e', '#38bdf8'] : ['#334155'],
             borderColor: '#1e293b',
             borderWidth: 2
           }]
         },
+        plugins: [piePercentageLabelsPlugin],
         options: {
           responsive: false,
           animation: false,
-          cutout: '60%',
+          cutout: '56%',
           plugins: {
+            piePercentageLabels: { totalIncome: totalInc, hasValues },
             legend: { display: false },
             tooltip: {
               callbacks: {
