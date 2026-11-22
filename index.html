@@ -240,7 +240,7 @@
     }
 
     .btn-xs {
-      padding: 4px 9px;
+      padding: 5px 10px;
       font-size: 0.76rem;
       border-radius: 6px;
     }
@@ -439,7 +439,7 @@
 
     tr.subitems-drawer-row td {
       background: rgba(15, 23, 42, 0.65);
-      padding: 14px 18px;
+      padding: 16px 18px;
       border-bottom: 1px solid var(--card-border);
     }
 
@@ -447,13 +447,71 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-width: 680px;
+      max-width: 720px;
     }
 
     .subitem-row {
       display: flex;
       gap: 8px;
       align-items: center;
+    }
+
+    /* Bolåne-specifik layout i utfällningsvyn */
+    .loan-drawer-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 1060px;
+    }
+
+    .loan-summary-strip {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+    }
+
+    .loan-summary-strip strong {
+      color: var(--text);
+    }
+
+    .loan-grid-header {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 0.9fr 1.1fr 1.1fr 1fr 38px;
+      gap: 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .loan-grid-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 0.9fr 1.1fr 1.1fr 1fr 38px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .loan-grid-row input {
+      padding: 6px 9px;
+      font-size: 0.85rem;
+      max-width: none !important;
+    }
+
+    @media (max-width: 860px) {
+      .loan-grid-header { display: none; }
+      .loan-grid-row {
+        grid-template-columns: 1fr 1fr;
+        background: rgba(30, 41, 59, 0.7);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border);
+      }
     }
 
     .tag-pill {
@@ -585,6 +643,7 @@
       <div class="card">
         <div class="card-title" id="titleCurSavings">Sparkvot (Mål: 20%)</div>
         <div class="big-value" id="kpiCurSavings" style="color: var(--green);">0 %</div>
+        <div class="sub-value" id="kpiSavingsSubDetail" style="margin-top:3px; font-size:0.75rem;">Inkl. amortering: 0 %</div>
         <div class="mom-diff" id="diffSavings" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="history-3m-list" id="hist3mSavings"></div>
       </div>
@@ -592,13 +651,14 @@
       <div class="card">
         <div class="card-title" id="titleCurBolan">Bolån (Mål: 20%)</div>
         <div class="big-value" id="kpiCurBolan" style="color: var(--purple);">0 kr</div>
+        <div class="sub-value" id="kpiBolanSplitDetail" style="margin-top:3px; font-size:0.75rem;">Ränta: 0 kr • Amort: 0 kr</div>
         <div class="mom-diff" id="diffBolan" style="color:var(--muted);">Ingen föreg. månad</div>
         <div class="history-3m-list" id="hist3mBolan"></div>
       </div>
     </div>
   </div>
 
-  <!-- NY SEKTION: ÅRSÖVERSIKT & STORA NYCKELTAL (IHOPFÄLLBAR OVANFÖR AKTUELL BUDGETMÅNAD) -->
+  <!-- ÅRSÖVERSIKT & STORA NYCKELTAL (IHOPFÄLLBAR OVANFÖR AKTUELL BUDGETMÅNAD) -->
   <div class="card">
     <div class="collapsible-header" id="toggleAnnualDrawerBtn">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -690,7 +750,7 @@
           Välj månad
           <input type="month" id="monthPicker" />
         </label>
-        <button class="btn btn-secondary" id="copyPrevMonthBtn" type="button" title="Kopiera planering & fasta poster från föregående månad">📋 Kopiera förra månaden</button>
+        <button class="btn btn-secondary" id="copyPrevMonthBtn" type="button" title="Kopiera planering, lån & fasta poster från föregående månad">📋 Kopiera förra månaden</button>
         <button class="btn btn-green" id="saveMonthBtn" type="button">💾 Spara månad</button>
       </div>
     </div>
@@ -768,7 +828,7 @@
     </div>
   </div>
 
-  <!-- 3. BUDGETPOSTER: IHOPFÄLLBAR SEKTION + SORTERBARA KOLUMNRUBRIKER + DROPFAKTUROR -->
+  <!-- 3. BUDGETPOSTER: IHOPFÄLLBAR SEKTION + SORTERBARA KOLUMNRUBRIKER + DROPFAKTUROR & BOLÅN -->
   <div class="card">
     <div class="collapsible-header" id="togglePostsDrawerBtn">
       <div style="display:flex; align-items:center; gap:10px;">
@@ -789,7 +849,7 @@
     <div id="postsDrawerBody" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--card-border);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div class="sub-value" style="margin-top:0;">
-          Klicka på en post (t.ex. <strong>Klarna Kredit</strong>) för att fälla ut och lägga in enskilda fakturor.
+          Klicka på en post (t.ex. <strong>Bolån</strong> eller <strong>Klarna Kredit</strong>) för att fälla ut och ange lånedelar, ränta, amortering eller enskilda fakturor.
         </div>
         <div class="row-flex">
           <input type="text" id="newItemName" placeholder="Ny post (t.ex. Klarna Kredit)" style="width:200px;" />
@@ -1055,6 +1115,25 @@
       ];
     }
 
+    // Hjälpfunktion som normaliserar äldre delposter (särskilt bolån) till nya fält
+    function normalizeSubItemsForItem(item) {
+      if (!Array.isArray(item.subItems)) item.subItems = [];
+      item.subItems.forEach(sub => {
+        if (item.bucket === 'bolan') {
+          if (sub.loanAmount === undefined) sub.loanAmount = 0;
+          if (sub.interestRate === undefined) sub.interestRate = 0;
+          if (sub.interestCost === undefined && sub.amortization === undefined) {
+            sub.interestCost = Number(sub.amount) || 0;
+            sub.amortization = 0;
+          } else {
+            sub.interestCost = Number(sub.interestCost) || 0;
+            sub.amortization = Number(sub.amortization) || 0;
+            sub.amount = sub.interestCost + sub.amortization;
+          }
+        }
+      });
+    }
+
     function getMonthRecord(monthKey) {
       if (!allMonthsData[monthKey]) {
         allMonthsData[monthKey] = {
@@ -1075,7 +1154,7 @@
       }
 
       (rec.items || []).forEach(it => {
-        if (!Array.isArray(it.subItems)) it.subItems = [];
+        normalizeSubItemsForItem(it);
         if (it.subItems.length > 0) {
           it.actual = it.subItems.reduce((sum, sub) => sum + (Number(sub.amount) || 0), 0);
         }
@@ -1192,6 +1271,7 @@
       let sumActualAll = 0;
 
       record.items.forEach((item, idx) => {
+        normalizeSubItemsForItem(item);
         const hasSubItems = item.subItems && item.subItems.length > 0;
         if (hasSubItems) {
           item.actual = item.subItems.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
@@ -1201,10 +1281,15 @@
         sumActualAll += Number(item.actual) || 0;
 
         const isExpanded = expandedItemIds.has(item.id);
+        const isLoanItem = item.bucket === 'bolan';
         const diff = (Number(item.planned) || 0) - (Number(item.actual) || 0);
         const isSaving = item.bucket === 'buffert' || item.bucket === 'mal';
         const diffColor = item.actual === 0 ? 'var(--muted)' : (isSaving ? (diff <= 0 ? 'var(--green)' : 'var(--red)') : (diff >= 0 ? 'var(--green)' : 'var(--red)'));
         const bInfo = BUCKET_LABELS[item.bucket] || BUCKET_LABELS.kredit;
+
+        const subBadgeText = isLoanItem
+          ? `${item.subItems.length} lån`
+          : `${item.subItems.length} fakturor`;
 
         const tr = document.createElement('tr');
         tr.className = 'main-budget-row';
@@ -1213,14 +1298,14 @@
             <div class="expand-toggle" onclick="toggleItemDrawer('${item.id}')">
               <span class="chevron ${isExpanded ? 'open' : ''}">▶</span>
               <strong>${item.name}</strong>
-              ${hasSubItems ? `<span class="subcount-badge">${item.subItems.length} fakturor</span>` : `<span style="font-size:0.75rem; color:var(--muted);">+ delposter</span>`}
+              ${hasSubItems ? `<span class="subcount-badge">${subBadgeText}</span>` : `<span style="font-size:0.75rem; color:var(--muted);">${isLoanItem ? '+ lånedelar' : '+ delposter'}</span>`}
             </div>
           </td>
           <td><span class="tag-pill ${bInfo.cls}">${bInfo.label}</span></td>
           <td style="color:var(--muted);">${getKovReferenceForRow(item, kov)}</td>
           <td><input type="number" value="${item.planned}" step="50" onchange="updateItemVal(${idx}, 'planned', this.value)" /></td>
           <td>
-            <input type="number" value="${item.actual}" step="50" ${hasSubItems ? 'readonly title="Summeras automatiskt från underfakturorna"' : ''} onchange="updateItemVal(${idx}, 'actual', this.value)" />
+            <input type="number" value="${item.actual}" step="50" ${hasSubItems ? 'readonly title="Summeras automatiskt från delposterna"' : ''} onchange="updateItemVal(${idx}, 'actual', this.value)" />
           </td>
           <td style="font-weight:700; color:${diffColor};">${diff >= 0 ? '+' : ''}${diff.toLocaleString('sv-SE')} kr</td>
           <td><button class="btn btn-danger" type="button" onclick="deleteBudgetItem(${idx})">✕</button></td>
@@ -1231,32 +1316,100 @@
           const subTr = document.createElement('tr');
           subTr.className = 'subitems-drawer-row';
 
-          const subListHtml = item.subItems.length === 0
-            ? `<div class="sub-value" style="margin-top:0;">Inga specifika fakturor inlagda ännu. Lägg till första fakturan nedan så räknas totalen ihop automatiskt!</div>`
-            : item.subItems.map((sub, sIdx) => `
-                <div class="subitem-row">
-                  <input type="text" value="${sub.title}" style="flex:1;" onchange="updateSubItem(${idx}, ${sIdx}, 'title', this.value)" />
-                  <input type="number" value="${sub.amount}" step="1" style="max-width:120px;" onchange="updateSubItem(${idx}, ${sIdx}, 'amount', this.value)" />
-                  <span style="color:var(--muted); font-size:0.82rem;">kr</span>
-                  <button class="btn btn-danger" type="button" onclick="deleteSubItem(${idx}, ${sIdx})">✕</button>
-                </div>
-              `).join('');
+          if (isLoanItem) {
+            // --- SPECIALVY FÖR BOLÅN: LÅNEBELOPP, RÄNTA %, RÄNTA KR, AMORTERING KR ---
+            let totDebt = 0, totIntCost = 0, totAmort = 0, weightedRateSum = 0;
+            item.subItems.forEach(s => {
+              const debt = Number(s.loanAmount) || 0;
+              const rate = Number(s.interestRate) || 0;
+              totDebt += debt;
+              totIntCost += Number(s.interestCost) || 0;
+              totAmort += Number(s.amortization) || 0;
+              weightedRateSum += debt * rate;
+            });
+            const avgRate = totDebt > 0 ? (weightedRateSum / totDebt).toFixed(2).replace('.', ',') : '0,00';
+            const netIntAfterTax = Math.round(totIntCost * 0.7);
 
-          subTr.innerHTML = `
-            <td colspan="7">
-              <div class="subitem-list">
-                <div style="font-size:0.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.04em;">
-                  Specifika fakturor / köp under "${item.name}"
+            const loanRowsHtml = item.subItems.length === 0
+              ? `<div class="sub-value" style="margin-top:0;">Inga lånedelar inlagda ännu. Lägg till era lån nedan med skuldbelopp, räntesats och amortering!</div>`
+              : `
+                <div class="loan-grid-header">
+                  <span>Lånenamn / Nummer</span>
+                  <span>Lånebelopp (kr)</span>
+                  <span>Ränta (%)</span>
+                  <span>Ränta / mån (kr)</span>
+                  <span>Amortering / mån (kr)</span>
+                  <span>Totalt / mån</span>
+                  <span></span>
                 </div>
-                ${subListHtml}
-                <div class="subitem-row" style="margin-top:4px; padding-top:8px; border-top:1px dashed var(--card-border);">
-                  <input type="text" id="newSubTitle_${idx}" placeholder="Beskrivning (t.ex. Klarna / ICA)" style="flex:1;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
-                  <input type="number" id="newSubAmount_${idx}" placeholder="Belopp (kr)" step="1" style="max-width:120px;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
-                  <button class="btn btn-xs" type="button" onclick="addSubItem(${idx})">+ Lägg till faktura</button>
+                ${item.subItems.map((sub, sIdx) => `
+                  <div class="loan-grid-row">
+                    <input type="text" value="${sub.title}" placeholder="Lån 1" onchange="updateLoanSubItem(${idx}, ${sIdx}, 'title', this.value)" />
+                    <input type="number" value="${sub.loanAmount || ''}" placeholder="Skuld kr" step="1000" onchange="updateLoanSubItem(${idx}, ${sIdx}, 'loanAmount', this.value)" />
+                    <input type="number" value="${sub.interestRate || ''}" placeholder="%" step="0.01" onchange="updateLoanSubItem(${idx}, ${sIdx}, 'interestRate', this.value)" />
+                    <input type="number" value="${sub.interestCost || 0}" placeholder="Ränta kr" step="1" onchange="updateLoanSubItem(${idx}, ${sIdx}, 'interestCost', this.value)" />
+                    <input type="number" value="${sub.amortization || 0}" placeholder="Amort kr" step="1" onchange="updateLoanSubItem(${idx}, ${sIdx}, 'amortization', this.value)" />
+                    <div style="font-weight:700; color:var(--purple); font-size:0.88rem;">${(Number(sub.amount) || 0).toLocaleString('sv-SE')} kr</div>
+                    <button class="btn btn-danger" type="button" onclick="deleteSubItem(${idx}, ${sIdx})">✕</button>
+                  </div>
+                `).join('')}
+              `;
+
+            subTr.innerHTML = `
+              <td colspan="7">
+                <div class="loan-drawer-wrapper">
+                  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <div style="font-size:0.78rem; font-weight:700; color:var(--purple); text-transform:uppercase; letter-spacing:0.04em;">
+                      Lånedelar under "${item.name}"
+                    </div>
+                    <div class="loan-summary-strip">
+                      <span>Total skuld: <strong>${totDebt.toLocaleString('sv-SE')} kr</strong></span>
+                      <span>Snittränta: <strong>${avgRate} %</strong></span>
+                      <span>Ränta/mån: <strong style="color:var(--red);">${totIntCost.toLocaleString('sv-SE')} kr</strong> (efter skatteavdrag: ~${netIntAfterTax.toLocaleString('sv-SE')} kr)</span>
+                      <span>Amortering/mån: <strong style="color:var(--green);">${totAmort.toLocaleString('sv-SE')} kr</strong></span>
+                    </div>
+                  </div>
+                  ${loanRowsHtml}
+                  <div class="loan-grid-row" style="margin-top:4px; padding-top:10px; border-top:1px dashed var(--card-border);">
+                    <input type="text" id="newLoanTitle_${idx}" placeholder="Lånenamn (t.ex. Lån 8)" />
+                    <input type="number" id="newLoanDebt_${idx}" placeholder="Lånebelopp (kr)" step="1000" oninput="autoPreviewNewLoanInterest(${idx})" />
+                    <input type="number" id="newLoanRate_${idx}" placeholder="Ränta (%)" step="0.01" oninput="autoPreviewNewLoanInterest(${idx})" />
+                    <input type="number" id="newLoanInt_${idx}" placeholder="Ränta/mån (kr)" step="1" />
+                    <input type="number" id="newLoanAmort_${idx}" placeholder="Amort/mån (kr)" step="1" />
+                    <button class="btn btn-xs" type="button" onclick="addLoanSubItem(${idx})" style="grid-column: span 2;">+ Lägg till lån</button>
+                  </div>
                 </div>
-              </div>
-            </td>
-          `;
+              </td>
+            `;
+          } else {
+            // --- STANDARDVY FÖR ÖVRIGA POSTER (KREDITKORT, RÄKNINGAR M.M.) ---
+            const subListHtml = item.subItems.length === 0
+              ? `<div class="sub-value" style="margin-top:0;">Inga specifika fakturor inlagda ännu. Lägg till första fakturan nedan så räknas totalen ihop automatiskt!</div>`
+              : item.subItems.map((sub, sIdx) => `
+                  <div class="subitem-row">
+                    <input type="text" value="${sub.title}" style="flex:1;" onchange="updateSubItem(${idx}, ${sIdx}, 'title', this.value)" />
+                    <input type="number" value="${sub.amount}" step="1" style="max-width:120px;" onchange="updateSubItem(${idx}, ${sIdx}, 'amount', this.value)" />
+                    <span style="color:var(--muted); font-size:0.82rem;">kr</span>
+                    <button class="btn btn-danger" type="button" onclick="deleteSubItem(${idx}, ${sIdx})">✕</button>
+                  </div>
+                `).join('');
+
+            subTr.innerHTML = `
+              <td colspan="7">
+                <div class="subitem-list">
+                  <div style="font-size:0.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.04em;">
+                    Specifika fakturor / köp under "${item.name}"
+                  </div>
+                  ${subListHtml}
+                  <div class="subitem-row" style="margin-top:4px; padding-top:8px; border-top:1px dashed var(--card-border);">
+                    <input type="text" id="newSubTitle_${idx}" placeholder="Beskrivning (t.ex. Klarna / ICA)" style="flex:1;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
+                    <input type="number" id="newSubAmount_${idx}" placeholder="Belopp (kr)" step="1" style="max-width:120px;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
+                    <button class="btn btn-xs" type="button" onclick="addSubItem(${idx})">+ Lägg till faktura</button>
+                  </div>
+                </div>
+              </td>
+            `;
+          }
           tbody.appendChild(subTr);
         }
       });
@@ -1271,6 +1424,61 @@
     window.toggleItemDrawer = function(itemId) {
       if (expandedItemIds.has(itemId)) expandedItemIds.delete(itemId);
       else expandedItemIds.add(itemId);
+      renderMonthTable();
+    };
+
+    // Automatisk förhandsberäkning av månadens räntekostnad när man skriver in lånebelopp och %
+    window.autoPreviewNewLoanInterest = function(itemIdx) {
+      const debt = Number(document.getElementById(`newLoanDebt_${itemIdx}`)?.value) || 0;
+      const rate = Number(document.getElementById(`newLoanRate_${itemIdx}`)?.value) || 0;
+      const intEl = document.getElementById(`newLoanInt_${itemIdx}`);
+      if (debt > 0 && rate > 0 && intEl) {
+        intEl.value = Math.round((debt * (rate / 100)) / 12);
+      }
+    };
+
+    window.addLoanSubItem = function(itemIdx) {
+      const title = (document.getElementById(`newLoanTitle_${itemIdx}`).value || '').trim() || 'Lån';
+      const loanAmount = Number(document.getElementById(`newLoanDebt_${itemIdx}`).value) || 0;
+      const interestRate = Number(document.getElementById(`newLoanRate_${itemIdx}`).value) || 0;
+      let interestCost = Number(document.getElementById(`newLoanInt_${itemIdx}`).value) || 0;
+      const amortization = Number(document.getElementById(`newLoanAmort_${itemIdx}`).value) || 0;
+
+      if (interestCost === 0 && loanAmount > 0 && interestRate > 0) {
+        interestCost = Math.round((loanAmount * (interestRate / 100)) / 12);
+      }
+
+      const amount = interestCost + amortization;
+      if (amount === 0 && loanAmount === 0) return;
+
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items[itemIdx].subItems.push({
+        id: Date.now().toString(),
+        title,
+        loanAmount,
+        interestRate,
+        interestCost,
+        amortization,
+        amount
+      });
+      expandedItemIds.add(record.items[itemIdx].id);
+      renderMonthTable();
+    };
+
+    window.updateLoanSubItem = function(itemIdx, subIdx, field, val) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      const sub = record.items[itemIdx].subItems[subIdx];
+
+      if (field === 'title') {
+        sub.title = val.trim() || 'Lån';
+      } else {
+        sub[field] = Number(val) || 0;
+        // Om man ändrar skuldbelopp eller räntesats och räntekostnaden inte var manuellt satt, räkna ut den
+        if ((field === 'loanAmount' || field === 'interestRate') && sub.loanAmount > 0 && sub.interestRate > 0) {
+          sub.interestCost = Math.round((sub.loanAmount * (sub.interestRate / 100)) / 12);
+        }
+      }
+      sub.amount = (Number(sub.interestCost) || 0) + (Number(sub.amortization) || 0);
       renderMonthTable();
     };
 
@@ -1323,7 +1531,7 @@
     }
 
     function getMonthMetrics(rec) {
-      let food = 0, fuel = 0, bolan = 0, drift = 0, exp = 0, sav = 0;
+      let food = 0, fuel = 0, bolan = 0, bolanInterest = 0, bolanAmort = 0, drift = 0, exp = 0, sav = 0;
       const inc = getRecordTotalIncome(rec);
 
       (rec.items || []).forEach(it => {
@@ -1339,13 +1547,24 @@
         ) {
           drift += val;
         }
-        if (it.bucket === 'bolan') bolan += val;
+        if (it.bucket === 'bolan') {
+          bolan += val;
+          if (Array.isArray(it.subItems) && it.subItems.length > 0) {
+            it.subItems.forEach(s => {
+              bolanInterest += Number(s.interestCost) || 0;
+              bolanAmort += Number(s.amortization) || 0;
+            });
+          } else {
+            bolanInterest += val;
+          }
+        }
         if (it.bucket === 'buffert' || it.bucket === 'mal') sav += val;
         else exp += val;
       });
 
       const savPct = inc > 0 ? (sav / inc) * 100 : 0;
-      return { inc, food, fuel, bolan, drift, exp, sav, savPct };
+      const savWithAmortPct = inc > 0 ? ((sav + bolanAmort) / inc) * 100 : 0;
+      return { inc, food, fuel, bolan, bolanInterest, bolanAmort, drift, exp, sav, savPct, savWithAmortPct };
     }
 
     function formatMomBadge(elId, diffVal, prevMonthKey, unit = 'kr', lowerIsBetter = true) {
@@ -1386,7 +1605,6 @@
       }).join('');
     }
 
-    // --- UPPDATERA ÅRSÖVERSIKT & STORA NYCKELTAL ---
     function updateAnnualOverview() {
       const yearSelect = document.getElementById('annualYearSelect');
       const curYear = getCurrentMonthKey().slice(0, 4);
@@ -1404,7 +1622,7 @@
       const selectedYear = yearSelect.value;
       const yearKeys = Object.keys(allMonthsData).filter(mk => mk.startsWith(selectedYear + '-')).sort();
 
-      let yInc = 0, yDrift = 0, yBolan = 0, ySav = 0, yFood = 0, yFuel = 0, yExp = 0;
+      let yInc = 0, yDrift = 0, yBolan = 0, yBolanAmort = 0, ySav = 0, yFood = 0, yFuel = 0, yExp = 0;
       let activeMonths = 0;
 
       yearKeys.forEach(mk => {
@@ -1414,6 +1632,7 @@
           yInc += m.inc;
           yDrift += m.drift;
           yBolan += m.bolan;
+          yBolanAmort += m.bolanAmort;
           ySav += m.sav;
           yFood += m.food;
           yFuel += m.fuel;
@@ -1441,7 +1660,7 @@
       document.getElementById('annHousingSub').textContent = `Bolån + Drift (${housingPct} % av årsinkomst)`;
 
       document.getElementById('annTotalSavings').textContent = `${Math.round(ySav).toLocaleString('sv-SE')} kr`;
-      document.getElementById('annSavingsRate').textContent = `Årlig sparkvot: ${savPct} % (Mål: 20 %)`;
+      document.getElementById('annSavingsRate').textContent = `Årlig sparkvot: ${savPct} % (+${Math.round(yBolanAmort).toLocaleString('sv-SE')} kr amort.)`;
 
       document.getElementById('annFoodTotal').textContent = `${Math.round(yFood).toLocaleString('sv-SE')} kr`;
       document.getElementById('annFoodSub').textContent = `Snitt: ${Math.round(yFood / div).toLocaleString('sv-SE')} kr/mån`;
@@ -1645,7 +1864,9 @@
       document.getElementById('kpiCurFuel').textContent = `${Math.round(curM.fuel).toLocaleString('sv-SE')} kr`;
       document.getElementById('kpiCurExpense').textContent = `${Math.round(curM.exp).toLocaleString('sv-SE')} kr`;
       document.getElementById('kpiCurSavings').textContent = `${curM.savPct.toFixed(1).replace('.', ',')} %`;
+      document.getElementById('kpiSavingsSubDetail').textContent = `Inkl. amortering (${Math.round(curM.bolanAmort).toLocaleString('sv-SE')} kr): ${curM.savWithAmortPct.toFixed(1).replace('.', ',')} %`;
       document.getElementById('kpiCurBolan').textContent = `${Math.round(curM.bolan).toLocaleString('sv-SE')} kr`;
+      document.getElementById('kpiBolanSplitDetail').textContent = `Ränta: ${Math.round(curM.bolanInterest).toLocaleString('sv-SE')} kr • Amort: ${Math.round(curM.bolanAmort).toLocaleString('sv-SE')} kr`;
 
       const prevKeys = monthKeys.filter(k => k < curKey).sort();
       const prevKey = prevKeys.length > 0 ? prevKeys[prevKeys.length - 1] : null;
@@ -1797,7 +2018,7 @@
       });
     }
 
-    // --- EVENT LISTENERS FÖR IHOPFÄLLBARA SEKTIONER & KNAPPAR ---
+    // --- EVENT LISTENERS ---
     document.getElementById('toggleAnnualDrawerBtn').addEventListener('click', () => {
       annualDrawerOpen = !annualDrawerOpen;
       document.getElementById('annualDrawerBody').style.display = annualDrawerOpen ? 'block' : 'none';
@@ -1883,7 +2104,27 @@
       const prev = getMonthRecord(keys[keys.length - 1]);
       allMonthsData[cur] = {
         incomeList: prev.incomeList.map(i => ({ ...i })),
-        items: prev.items.map(it => ({ ...it, actual: 0, subItems: [] }))
+        items: prev.items.map(it => {
+          // Kopierar lånedelar (skuldbelopp minskat med amortering, räntesats och amortering behålls)
+          if (it.bucket === 'bolan' && Array.isArray(it.subItems) && it.subItems.length > 0) {
+            const copiedLoans = it.subItems.map(s => {
+              const newDebt = Math.max(0, (Number(s.loanAmount) || 0) - (Number(s.amortization) || 0));
+              const newInt = (newDebt > 0 && s.interestRate > 0)
+                ? Math.round((newDebt * (s.interestRate / 100)) / 12)
+                : (Number(s.interestCost) || 0);
+              const amort = Number(s.amortization) || 0;
+              return {
+                ...s,
+                loanAmount: newDebt,
+                interestCost: newInt,
+                amount: newInt + amort
+              };
+            });
+            const sumLoanActual = copiedLoans.reduce((sum, s) => sum + s.amount, 0);
+            return { ...it, actual: sumLoanActual, subItems: copiedLoans };
+          }
+          return { ...it, actual: 0, subItems: [] };
+        })
       };
       renderMonthTable();
     });
@@ -1900,13 +2141,13 @@
     });
 
     document.getElementById('exportCsvBtn').addEventListener('click', () => {
-      let csv = 'Manad;Post;Delpost;Korg;Planerat;Utfall\n';
+      let csv = 'Manad;Post;Delpost;Korg;Planerat;Utfall;Lanebelopp;RantaPct;RantaKr;AmorteringKr\n';
       Object.keys(allMonthsData).sort().forEach(mk => {
         const rec = getMonthRecord(mk);
         (rec.items || []).forEach(it => {
-          csv += `${mk};"${it.name}";"";${it.bucket};${it.planned};${it.actual}\n`;
+          csv += `${mk};"${it.name}";"";${it.bucket};${it.planned};${it.actual};;;;\n`;
           (it.subItems || []).forEach(sub => {
-            csv += `${mk};"${it.name}";"${sub.title}";${it.bucket};0;${sub.amount}\n`;
+            csv += `${mk};"${it.name}";"${sub.title}";${it.bucket};0;${sub.amount};${sub.loanAmount || ''};${sub.interestRate || ''};${sub.interestCost || ''};${sub.amortization || ''}\n`;
           });
         });
       });
@@ -1918,6 +2159,8 @@
       a.click();
     });
 
+    document.getElementById('kovDrawerBody').style.display = 'none';
+    document.getElementById('kovChevron').classList.remove('open');
     getCurrentMonthKey();
     renderKovMembers();
     renderMonthTable();
