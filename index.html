@@ -34,7 +34,7 @@
       background-color: var(--bg);
       color: var(--text);
       padding: 20px;
-      max-width: 1220px;
+      max-width: 1240px;
       margin: 0 auto;
     }
 
@@ -69,6 +69,21 @@
       gap: 6px;
     }
 
+    /* Övre översikt: Tårtdiagram till vänster + 5 KPI-kort till höger */
+    .top-overview-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 18px;
+      margin-bottom: 22px;
+      align-items: stretch;
+    }
+
+    .kpi-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
     .grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -83,12 +98,18 @@
       margin-bottom: 22px;
     }
 
+    @media (max-width: 1024px) {
+      .top-overview-grid { grid-template-columns: 1fr; }
+      .kpi-grid-5 { grid-template-columns: repeat(2, 1fr); }
+    }
+
     @media (max-width: 960px) {
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
       .grid-2 { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 540px) {
+      .kpi-grid-5 { grid-template-columns: 1fr; }
       .grid-4 { grid-template-columns: 1fr; }
     }
 
@@ -100,7 +121,7 @@
       margin-bottom: 20px;
     }
 
-    .grid-4 .card, .grid-2 .card {
+    .top-overview-grid .card, .kpi-grid-5 .card, .grid-4 .card, .grid-2 .card {
       margin-bottom: 0;
     }
 
@@ -114,7 +135,7 @@
     }
 
     .big-value {
-      font-size: 1.8rem;
+      font-size: 1.65rem;
       font-weight: 700;
     }
 
@@ -123,6 +144,31 @@
       font-size: 0.82rem;
       margin-top: 6px;
       line-height: 1.45;
+    }
+
+    .mom-diff {
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-top: 6px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .pie-wrapper {
+      position: relative;
+      height: 210px;
+      width: 100%;
+      margin: 6px 0;
+    }
+
+    .pie-legend-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 4px 0;
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
     }
 
     .btn {
@@ -413,16 +459,180 @@
     </div>
   </header>
 
-  <!-- 1. ROLIGA NYCKELTAL & HISTORISKA SNITT -->
-  <div class="grid-4">
-    <div class="card">
-      <div class="card-title">Snitt Matkostnad / mån</div>
-      <div class="big-value" id="kpiAvgFood" style="color: var(--yellow);">0 kr</div>
-      <div class="sub-value" id="kpiAvgFoodSub">KOV 2027 rek: 8 300 kr/mån</div>
+  <!-- 1. TÅRTDIAGRAM (INKOMSTER VS UTGIFTER %) + NYCKELTAL & SKILLNAD MOT FÖREGÅENDE MÅNAD -->
+  <div class="top-overview-grid">
+    <!-- Tårtdiagram överst -->
+    <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Inkomst vs. Utgifter (%)</div>
+        <div class="sub-value" style="margin-top:0;" id="pieSubtitle">Fördelning av månadens nettoinkomst</div>
+      </div>
+      <div class="pie-wrapper">
+        <canvas id="incomeExpensePieChart"></canvas>
+      </div>
+      <div>
+        <div class="pie-legend-row">
+          <span style="color:var(--red);">● Totala utgifter</span>
+          <strong id="pieExpensePct">0 % (0 kr)</strong>
+        </div>
+        <div class="pie-legend-row">
+          <span style="color:var(--green);">● Sparande (Buffert & Mål)</span>
+          <strong id="pieSavingsPct">0 % (0 kr)</strong>
+        </div>
+        <div class="pie-legend-row">
+          <span style="color:var(--accent);">● Kvar av inkomst</span>
+          <strong id="pieRemainingPct">0 % (0 kr)</strong>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <div class="card-title">Snitt Drivmedel / mån</div>
-      <div class="big-value" id="kpiAvgFuel" style="color: var(--accent);">0 kr</div>
+
+    <!-- 5 Nyckeltalskort med +/- mot föregående månad -->
+    <div class="kpi-grid-5">
+      <div class="card">
+        <div class="card-title">Snitt Inkomster / mån</div>
+        <div class="big-value" id="kpiAvgIncome" style="color: var(--green);">0 kr</div>
+        <div class="mom-diff" id="diffIncome" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="sub-value" id="kpiAvgIncomeSub">Alla inkomstkällor</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Snitt Matkostnad / mån</div>
+        <div class="big-value" id="kpiAvgFood" style="color: var(--yellow);">0 kr</div>
+        <div class="mom-diff" id="diffFood" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="sub-value" id="kpiAvgFoodSub">KOV 2027 rek: 8 300 kr/mån</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Snitt Drivmedel / mån</div>
+        <div class="big-value" id="kpiAvgFuel" style="color: var(--accent);">0 kr</div>
+        <div class="mom-diff" id="diffFuel" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="sub-value" id="kpiAvgFuelSub">Baserat på sparade månader</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Snitt Utgifter / mån</div>
+        <div class="big-value" id="kpiAvgExpense">0 kr</div>
+        <div class="mom-diff" id="diffExpense" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="sub-value" id="kpiAvgExpenseSub">Räkningar + Kreditkort + Bolån</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Snitt Sparkvot (Mål: 20%)</div>
+        <div class="big-value" id="kpiAvgSavings" style="color: var(--green);">0 %</div>
+        <div class="mom-diff" id="diffSavings" style="color:var(--muted);">Föreg. mån: Ingen data</div>
+        <div class="sub-value" id="kpiAvgSavingsSub">Buffert (15%) + Mål (5%)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MÅNADSVÄLJARE, INKOMSTER (MED DROPMENY) & NOLLBUDGET-MALL (80/20) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Aktuell budgetmånad & Nollbudget (80/20-modellen)</div>
+        <div class="sub-value" style="margin-top:0;">
+          Varje krona av inkomsten fördelas till 0 kr kvar. <strong>Målbeloppen i varje korg räknas ut i procent av just den här månadens totala nettoinkomst och varierar därför månad för månad.</strong>
+        </div>
+      </div>
+      <div class="row-flex">
+        <label style="min-width:165px;">
+          Välj månad
+          <input type="month" id="monthPicker" />
+        </label>
+        <button class="btn btn-secondary" id="copyPrevMonthBtn" type="button" title="Kopiera planering & fasta poster från föregående månad">📋 Kopiera förra månaden</button>
+        <button class="btn btn-green" id="saveMonthBtn" type="button">💾 Spara månad</button>
+      </div>
+    </div>
+
+    <!-- Utfällbar Inkomstsektion -->
+    <div class="income-panel">
+      <div class="income-summary-bar" id="toggleIncomeDrawerBtn">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="chevron open" id="incomeChevron">▶</span>
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">
+              Inkomster & Intäkter <span class="subcount-badge" id="incomeCountBadge">4 poster</span>
+            </div>
+            <div class="sub-value" style="margin-top:2px;">Klicka för att fälla in/ut och lägga till löner, barnbidrag, hyresintäkt m.m.</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="card-title" style="margin-bottom:2px;">Total Nettoinkomst (styr månadens mål)</div>
+          <div style="font-size:1.45rem; font-weight:700; color:var(--green);" id="totalIncomeDisplay">0 kr</div>
+          <div class="sub-value" style="margin-top:0;" id="zeroBudgetStatus">Nollbudget-saldo: 0 kr kvar</div>
+        </div>
+      </div>
+
+      <div class="income-drawer" id="incomeDrawerBody">
+        <div id="incomeRowsContainer"></div>
+        <div class="row-flex" style="margin-top:10px;">
+          <input type="text" id="newIncomeName" placeholder="Ny inkomst (t.ex. Hyresintäkt / VAB / Bonus)" style="max-width:280px;" />
+          <input type="number" id="newIncomeAmount" placeholder="Belopp (kr)" step="100" style="max-width:140px;" />
+          <button class="btn btn-secondary btn-xs" id="addIncomeBtn" type="button" style="padding:8px 12px;">+ Lägg till inkomst</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bankens 5 korgar: 80% Bankkonto (30/30/20) + 20% Sparkonto (15/5) -->
+    <div class="bucket-grid">
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--accent);">Räkningar (30%)</span>
+          <span id="targetRakningar" title="30 % av denna månads totala inkomst">Mål (30%): 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualRakningar">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barRakningar" style="width:0%; background:var(--accent);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planRakningarText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--yellow);">Kreditkort (30%)</span>
+          <span id="targetKredit" title="30 % av denna månads totala inkomst">Mål (30%): 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualKredit">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barKredit" style="width:0%; background:var(--yellow);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planKreditText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--purple);">Bolån (20%)</span>
+          <span id="targetBolan" title="20 % av denna månads totala inkomst">Mål (20%): 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualBolan">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barBolan" style="width:0%; background:var(--purple);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBolanText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:var(--green);">Buffert (15%)</span>
+          <span id="targetBuffert" title="15 % av denna månads totala inkomst">Mål (15%): 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualBuffert">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barBuffert" style="width:0%; background:var(--green);"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planBuffertText">Planerat: 0 kr</div>
+      </div>
+
+      <div class="bucket-box">
+        <div class="bucket-header">
+          <span style="color:#f472b6;">Sparmål (5%)</span>
+          <span id="targetMal" title="5 % av denna månads totala inkomst">Mål (5%): 0 kr</span>
+        </div>
+        <div style="font-size:1.1rem; font-weight:700;" id="actualMal">Utfall: 0 kr</div>
+        <div class="progress-bg"><div class="progress-fill" id="barMal" style="width:0%; background:#f472b6;"></div></div>
+        <div class="sub-value" style="margin-top:0; font-size:0.74rem;" id="planMalText">Planerat: 0 kr</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BUDGETPOSTER: PLANERING VS UTFALL (MED UTFÄLLBARA FAKTUROR PÅ VARJE RAD) -->
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div class="card-title" style="margin-bottom:2px;">Månadens Poster – Planering vs. Faktiskt Utfall</div>
+        <div class="sub-value" style="margin-top:0;">Klicka på en pos0 kr</div>
       <div class="sub-value" id="kpiAvgFuelSub">Baserat på sparade månader</div>
     </div>
     <div class="card">
