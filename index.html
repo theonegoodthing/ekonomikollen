@@ -154,8 +154,14 @@
       background: rgba(239, 68, 68, 0.15);
       color: var(--red);
       border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 6px 10px;
+      padding: 5px 9px;
       font-size: 0.78rem;
+    }
+
+    .btn-xs {
+      padding: 4px 9px;
+      font-size: 0.76rem;
+      border-radius: 6px;
     }
 
     input[type="text"], input[type="number"], input[type="month"], select {
@@ -171,6 +177,13 @@
     input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
+    }
+
+    input[readonly] {
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--accent);
+      font-weight: 700;
+      cursor: not-allowed;
     }
 
     label {
@@ -233,7 +246,38 @@
       transition: width 0.3s;
     }
 
-    /* Tabell för Budgetrader */
+    /* Utfällbar Inkomstsektion */
+    .income-panel {
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .income-summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .income-drawer {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .income-row-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Tabell för Budgetrader + Dropmeny för fakturor */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -257,6 +301,61 @@
     td input[type="number"] {
       padding: 6px 8px;
       max-width: 115px;
+    }
+
+    tr.main-budget-row {
+      transition: background-color 0.15s;
+    }
+
+    tr.main-budget-row:hover {
+      background-color: rgba(56, 189, 248, 0.04);
+    }
+
+    .expand-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chevron {
+      display: inline-block;
+      transition: transform 0.2s;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    .chevron.open {
+      transform: rotate(90deg);
+    }
+
+    .subcount-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    tr.subitems-drawer-row td {
+      background: rgba(15, 23, 42, 0.65);
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .subitem-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 680px;
+    }
+
+    .subitem-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
 
     .tag-pill {
@@ -338,7 +437,7 @@
     </div>
   </div>
 
-  <!-- 2. MÅNADSVÄLJARE, INKOMSTER & NOLLBUDGET-MALL (80/20) -->
+  <!-- 2. MÅNADSVÄLJARE, INKOMSTER (MED DROPMENY) & NOLLBUDGET-MALL (80/20) -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
       <div>
@@ -355,24 +454,32 @@
       </div>
     </div>
 
-    <!-- Inkomster -->
-    <div class="row-flex" style="background: rgba(15,23,42,0.45); padding:14px; border-radius:10px; border:1px solid var(--card-border);">
-      <label style="flex:1; min-width:150px;">
-        Lön 1 (netto kr)
-        <input type="number" id="incSalary1" value="0" step="100" />
-      </label>
-      <label style="flex:1; min-width:150px;">
-        Lön 2 (netto kr)
-        <input type="number" id="incSalary2" value="0" step="100" />
-      </label>
-      <label style="flex:1; min-width:150px;">
-        Barnbidrag & Övrigt (t.ex. hyra)
-        <input type="number" id="incOther" value="0" step="100" />
-      </label>
-      <div style="flex:1; min-width:180px; text-align:right;">
-        <div class="card-title" style="margin-bottom:2px;">Total Nettoinkomst</div>
-        <div style="font-size:1.45rem; font-weight:700; color:var(--green);" id="totalIncomeDisplay">0 kr</div>
-        <div class="sub-value" style="margin-top:0;" id="zeroBudgetStatus">Nollbudget-saldo: 0 kr kvar</div>
+    <!-- Utfällbar Inkomstsektion -->
+    <div class="income-panel">
+      <div class="income-summary-bar" id="toggleIncomeDrawerBtn">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="chevron open" id="incomeChevron">▶</span>
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">
+              Inkomster & Intäkter <span class="subcount-badge" id="incomeCountBadge">4 poster</span>
+            </div>
+            <div class="sub-value" style="margin-top:2px;">Klicka för att fälla in/ut och lägga till löner, barnbidrag, hyresintäkt m.m.</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="card-title" style="margin-bottom:2px;">Total Nettoinkomst</div>
+          <div style="font-size:1.45rem; font-weight:700; color:var(--green);" id="totalIncomeDisplay">0 kr</div>
+          <div class="sub-value" style="margin-top:0;" id="zeroBudgetStatus">Nollbudget-saldo: 0 kr kvar</div>
+        </div>
+      </div>
+
+      <div class="income-drawer" id="incomeDrawerBody">
+        <div id="incomeRowsContainer"></div>
+        <div class="row-flex" style="margin-top:10px;">
+          <input type="text" id="newIncomeName" placeholder="Ny inkomst (t.ex. Hyresintäkt / VAB / Bonus)" style="max-width:280px;" />
+          <input type="number" id="newIncomeAmount" placeholder="Belopp (kr)" step="100" style="max-width:140px;" />
+          <button class="btn btn-secondary btn-xs" id="addIncomeBtn" type="button" style="padding:8px 12px;">+ Lägg till inkomst</button>
+        </div>
       </div>
     </div>
 
@@ -430,15 +537,15 @@
     </div>
   </div>
 
-  <!-- 3. BUDGETPOSTER: PLANERING VS UTFALL (INKL. KREDITKORTSFAKTUROR) -->
+  <!-- 3. BUDGETPOSTER: PLANERING VS UTFALL (MED UTFÄLLBARA FAKTUROR PÅ VARJE RAD) -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div>
         <div class="card-title" style="margin-bottom:2px;">Månadens Poster – Planering vs. Faktiskt Utfall</div>
-        <div class="sub-value" style="margin-top:0;">Lägg in kreditkortsfakturorna (Matkort, Drivmedel, Övrigt) och fasta räkningar för vald månad.</div>
+        <div class="sub-value" style="margin-top:0;">Klicka på en post (t.ex. <strong>Klarna Kredit</strong>) för att fälla ut och lägga in enskilda fakturor – totalsumman räknas ihop automatiskt.</div>
       </div>
       <div class="row-flex">
-        <input type="text" id="newItemName" placeholder="Ny post (t.ex. Amex / Fritid)" style="width:190px;" />
+        <input type="text" id="newItemName" placeholder="Ny post (t.ex. Klarna Kredit)" style="width:200px;" />
         <select id="newItemBucket" style="width:155px;">
           <option value="kredit">Kreditkort (30%)</option>
           <option value="rakningar">Räkningar (30%)</option>
@@ -454,7 +561,7 @@
       <table>
         <thead>
           <tr>
-            <th>Kategori / Kreditkort</th>
+            <th>Kategori / Kreditkort (Klicka för fakturor)</th>
             <th>Kontokorg</th>
             <th>KOV 2027 Riktvärde</th>
             <th>Planerat (kr)</th>
@@ -592,7 +699,6 @@
       }
     };
 
-    // Förifylld familj: Jonny, Maria, Theo (4-6), Amanda (0)
     let kovMembers = JSON.parse(localStorage.getItem('ekonomikollen_kov_members') || 'null') || [
       { id: 'm1', name: 'Jonny', age: '25-50' },
       { id: 'm2', name: 'Maria', age: '25-50' },
@@ -601,6 +707,8 @@
     ];
 
     let allMonthsData = JSON.parse(localStorage.getItem('ekonomikollen_months') || '{}');
+    let expandedItemIds = new Set();
+    let incomeDrawerOpen = true;
     let currentUser = null;
     let dbRef = null;
     let trendChartInst = null;
@@ -621,7 +729,6 @@
       const count = Math.min(7, Math.max(1, kovMembers.length));
       const shared = { ...KOV_2027.sharedHousehold[count] };
 
-      // Fotnot 5 i KOV 2027: Minska internet/mobil med 229 kr/mån om barn under 8 år finns
       const hasChildUnder8 = kovMembers.some(m => ['0', '1-3', '4-6'].includes(m.age));
       if (hasChildUnder8) {
         shared.internetMobil = Math.max(0, shared.internetMobil - 229);
@@ -667,28 +774,89 @@
     function createDefaultItemsForMonth() {
       const kov = calculateKovTotals();
       return [
-        { id: 'i1', name: 'Kreditkort: Mat & Dagligvaror (ICA)', bucket: 'kredit', kovKey: 'food', planned: kov.foodSum + kov.shared.forbrukning, actual: 0 },
-        { id: 'i2', name: 'Kreditkort: Drivmedel & Bil', bucket: 'kredit', kovKey: null, planned: 2500, actual: 0 },
-        { id: 'i3', name: 'Kreditkort: Övrigt (Kläder, Hygien, Lek)', bucket: 'kredit', kovKey: 'indiv', planned: kov.indivSum, actual: 0 },
-        { id: 'i4', name: 'El & Uppvärmning (Ellevio / Bixia)', bucket: 'rakningar', kovKey: 'el', planned: 2600, actual: 0 },
-        { id: 'i5', name: 'Vatten, Avlopp & Renhållning', bucket: 'rakningar', kovKey: 'va', planned: kov.shared.va, actual: 0 },
-        { id: 'i6', name: 'Bredband, Mobil & Media', bucket: 'rakningar', kovKey: 'media', planned: kov.shared.internetMobil + kov.shared.media, actual: 0 },
-        { id: 'i7', name: 'Försäkringar (Hem, Barn, Bil)', bucket: 'rakningar', kovKey: 'ins', planned: 1500, actual: 0 },
-        { id: 'i8', name: 'Bolån (Ränta & Amortering)', bucket: 'bolan', kovKey: null, planned: 10000, actual: 0 },
-        { id: 'i9', name: 'Buffertsparande (15%)', bucket: 'buffert', kovKey: null, planned: 7500, actual: 0 },
-        { id: 'i10', name: 'Målsparande / ISK (5%)', bucket: 'mal', kovKey: null, planned: 2500, actual: 0 }
+        { id: 'i1', name: 'Kreditkort: Mat & Dagligvaror (ICA)', bucket: 'kredit', kovKey: 'food', planned: kov.foodSum + kov.shared.forbrukning, actual: 0, subItems: [] },
+        { id: 'i2', name: 'Kreditkort: Drivmedel & Bil', bucket: 'kredit', kovKey: null, planned: 2500, actual: 0, subItems: [] },
+        { id: 'i3', name: 'Klarna Kredit', bucket: 'kredit', kovKey: null, planned: 1500, actual: 0, subItems: [] },
+        { id: 'i4', name: 'Kreditkort: Övrigt (Kläder, Hygien, Lek)', bucket: 'kredit', kovKey: 'indiv', planned: kov.indivSum, actual: 0, subItems: [] },
+        { id: 'i5', name: 'El & Uppvärmning (Ellevio / Bixia)', bucket: 'rakningar', kovKey: 'el', planned: 2600, actual: 0, subItems: [] },
+        { id: 'i6', name: 'Vatten, Avlopp & Renhållning', bucket: 'rakningar', kovKey: 'va', planned: kov.shared.va, actual: 0, subItems: [] },
+        { id: 'i7', name: 'Bredband, Mobil & Media', bucket: 'rakningar', kovKey: 'media', planned: kov.shared.internetMobil + kov.shared.media, actual: 0, subItems: [] },
+        { id: 'i8', name: 'Försäkringar (Hem, Barn, Bil)', bucket: 'rakningar', kovKey: 'ins', planned: 1500, actual: 0, subItems: [] },
+        { id: 'i9', name: 'Bolån (Ränta & Amortering)', bucket: 'bolan', kovKey: null, planned: 10000, actual: 0, subItems: [] },
+        { id: 'i10', name: 'Buffertsparande (15%)', bucket: 'buffert', kovKey: null, planned: 7500, actual: 0, subItems: [] },
+        { id: 'i11', name: 'Målsparande / ISK (5%)', bucket: 'mal', kovKey: null, planned: 2500, actual: 0, subItems: [] }
+      ];
+    }
+
+    function createDefaultIncomes() {
+      return [
+        { id: 'inc1', name: 'Lön Jonny (netto)', amount: 30000 },
+        { id: 'inc2', name: 'Lön Maria (netto)', amount: 25000 },
+        { id: 'inc3', name: 'Barnbidrag', amount: 2650 },
+        { id: 'inc4', name: 'Hyresintäkt lägenhet', amount: 0 }
       ];
     }
 
     function getMonthRecord(monthKey) {
       if (!allMonthsData[monthKey]) {
         allMonthsData[monthKey] = {
-          income: { salary1: 30000, salary2: 25000, other: 2650 },
+          incomeList: createDefaultIncomes(),
           items: createDefaultItemsForMonth()
         };
       }
-      return allMonthsData[monthKey];
+      const rec = allMonthsData[monthKey];
+
+      // Migrera äldre format (salary1/salary2/other) till dynamisk incomeList om det behövs
+      if (!Array.isArray(rec.incomeList)) {
+        const old = rec.income || {};
+        rec.incomeList = [
+          { id: 'inc1', name: 'Lön 1 (netto)', amount: Number(old.salary1) || 0 },
+          { id: 'inc2', name: 'Lön 2 (netto)', amount: Number(old.salary2) || 0 },
+          { id: 'inc3', name: 'Barnbidrag & Övrigt', amount: Number(old.other) || 0 }
+        ];
+      }
+
+      // Säkerställ att alla poster har en subItems-array och korrekt utfallssumma
+      (rec.items || []).forEach(it => {
+        if (!Array.isArray(it.subItems)) it.subItems = [];
+        if (it.subItems.length > 0) {
+          it.actual = it.subItems.reduce((sum, sub) => sum + (Number(sub.amount) || 0), 0);
+        }
+      });
+
+      return rec;
     }
+
+    // --- RENDERA INKOMSTER (DROPMENY) ---
+    function renderIncomeList() {
+      const record = getMonthRecord(getCurrentMonthKey());
+      const container = document.getElementById('incomeRowsContainer');
+      document.getElementById('incomeCountBadge').textContent = `${record.incomeList.length} poster`;
+
+      container.innerHTML = record.incomeList.map((inc, idx) => `
+        <div class="income-row-item">
+          <input type="text" value="${inc.name}" style="flex:1; min-width:190px; max-width:300px;" onchange="updateIncomeRow(${idx}, 'name', this.value)" />
+          <input type="number" value="${inc.amount}" step="100" style="max-width:140px;" onchange="updateIncomeRow(${idx}, 'amount', this.value)" />
+          <span style="color:var(--muted); font-size:0.85rem;">kr</span>
+          <button class="btn btn-danger" type="button" onclick="deleteIncomeRow(${idx})" title="Ta bort inkomst">✕</button>
+        </div>
+      `).join('');
+    }
+
+    window.updateIncomeRow = function(idx, field, val) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      if (field === 'amount') record.incomeList[idx].amount = Number(val) || 0;
+      else record.incomeList[idx].name = val.trim() || 'Inkomst';
+      recalculateBudgetsAndCharts();
+    };
+
+    window.deleteIncomeRow = function(idx) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      if (record.incomeList.length <= 1) return;
+      record.incomeList.splice(idx, 1);
+      renderIncomeList();
+      recalculateBudgetsAndCharts();
+    };
 
     function getKovReferenceForRow(item, kov) {
       if (item.kovKey === 'food') return `${(kov.foodSum + kov.shared.forbrukning).toLocaleString('sv-SE')} kr`;
@@ -708,39 +876,122 @@
       mal: { label: 'Sparmål (5%)', cls: 'tag-mal' }
     };
 
+    // --- RENDERA HUVUDTABELL + DROPMENYER FÖR UNDERFAKTUROR ---
     function renderMonthTable() {
       const monthKey = getCurrentMonthKey();
       const record = getMonthRecord(monthKey);
       const kov = calculateKovTotals();
 
-      document.getElementById('incSalary1').value = record.income.salary1 || 0;
-      document.getElementById('incSalary2').value = record.income.salary2 || 0;
-      document.getElementById('incOther').value = record.income.other || 0;
+      renderIncomeList();
 
       const tbody = document.getElementById('budgetTableBody');
       tbody.innerHTML = '';
 
       record.items.forEach((item, idx) => {
+        const hasSubItems = item.subItems && item.subItems.length > 0;
+        if (hasSubItems) {
+          item.actual = item.subItems.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+        }
+
+        const isExpanded = expandedItemIds.has(item.id);
         const diff = (Number(item.planned) || 0) - (Number(item.actual) || 0);
         const isSaving = item.bucket === 'buffert' || item.bucket === 'mal';
         const diffColor = item.actual === 0 ? 'var(--muted)' : (isSaving ? (diff <= 0 ? 'var(--green)' : 'var(--red)') : (diff >= 0 ? 'var(--green)' : 'var(--red)'));
         const bInfo = BUCKET_LABELS[item.bucket] || BUCKET_LABELS.kredit;
 
         const tr = document.createElement('tr');
+        tr.className = 'main-budget-row';
         tr.innerHTML = `
-          <td><strong>${item.name}</strong></td>
+          <td>
+            <div class="expand-toggle" onclick="toggleItemDrawer('${item.id}')">
+              <span class="chevron ${isExpanded ? 'open' : ''}">▶</span>
+              <strong>${item.name}</strong>
+              ${hasSubItems ? `<span class="subcount-badge">${item.subItems.length} fakturor</span>` : `<span style="font-size:0.75rem; color:var(--muted);">+ delposter</span>`}
+            </div>
+          </td>
           <td><span class="tag-pill ${bInfo.cls}">${bInfo.label}</span></td>
           <td style="color:var(--muted);">${getKovReferenceForRow(item, kov)}</td>
           <td><input type="number" value="${item.planned}" step="50" onchange="updateItemVal(${idx}, 'planned', this.value)" /></td>
-          <td><input type="number" value="${item.actual}" step="50" onchange="updateItemVal(${idx}, 'actual', this.value)" /></td>
+          <td>
+            <input type="number" value="${item.actual}" step="50" ${hasSubItems ? 'readonly title="Summeras automatiskt från underfakturorna"' : ''} onchange="updateItemVal(${idx}, 'actual', this.value)" />
+          </td>
           <td style="font-weight:700; color:${diffColor};">${diff >= 0 ? '+' : ''}${diff.toLocaleString('sv-SE')} kr</td>
           <td><button class="btn btn-danger" type="button" onclick="deleteBudgetItem(${idx})">✕</button></td>
         `;
         tbody.appendChild(tr);
+
+        // Utfälld dropmeny med specifika fakturor för denna post
+        if (isExpanded) {
+          const subTr = document.createElement('tr');
+          subTr.className = 'subitems-drawer-row';
+
+          const subListHtml = item.subItems.length === 0
+            ? `<div class="sub-value" style="margin-top:0;">Inga specifika fakturor inlagda ännu. Lägg till första fakturan nedan så räknas totalen ihop automatiskt!</div>`
+            : item.subItems.map((sub, sIdx) => `
+                <div class="subitem-row">
+                  <input type="text" value="${sub.title}" style="flex:1;" onchange="updateSubItem(${idx}, ${sIdx}, 'title', this.value)" />
+                  <input type="number" value="${sub.amount}" step="1" style="max-width:120px;" onchange="updateSubItem(${idx}, ${sIdx}, 'amount', this.value)" />
+                  <span style="color:var(--muted); font-size:0.82rem;">kr</span>
+                  <button class="btn btn-danger" type="button" onclick="deleteSubItem(${idx}, ${sIdx})">✕</button>
+                </div>
+              `).join('');
+
+          subTr.innerHTML = `
+            <td colspan="7">
+              <div class="subitem-list">
+                <div style="font-size:0.78rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.04em;">
+                  Specifika fakturor / köp under "${item.name}"
+                </div>
+                ${subListHtml}
+                <div class="subitem-row" style="margin-top:4px; padding-top:8px; border-top:1px dashed var(--card-border);">
+                  <input type="text" id="newSubTitle_${idx}" placeholder="Beskrivning (t.ex. Klarna: Barnkläder / ICA)" style="flex:1;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
+                  <input type="number" id="newSubAmount_${idx}" placeholder="Belopp (kr)" step="1" style="max-width:120px;" onkeydown="if(event.key==='Enter') addSubItem(${idx})" />
+                  <button class="btn btn-xs" type="button" onclick="addSubItem(${idx})">+ Lägg till faktura</button>
+                </div>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(subTr);
+        }
       });
 
       recalculateBudgetsAndCharts();
     }
+
+    window.toggleItemDrawer = function(itemId) {
+      if (expandedItemIds.has(itemId)) expandedItemIds.delete(itemId);
+      else expandedItemIds.add(itemId);
+      renderMonthTable();
+    };
+
+    window.addSubItem = function(itemIdx) {
+      const titleEl = document.getElementById(`newSubTitle_${itemIdx}`);
+      const amountEl = document.getElementById(`newSubAmount_${itemIdx}`);
+      const title = (titleEl.value || '').trim() || 'Faktura';
+      const amount = Number(amountEl.value) || 0;
+      if (amount === 0 && !titleEl.value.trim()) return;
+
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items[itemIdx].subItems.push({ id: Date.now().toString(), title, amount });
+      expandedItemIds.add(record.items[itemIdx].id);
+      renderMonthTable();
+    };
+
+    window.updateSubItem = function(itemIdx, subIdx, field, val) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      if (field === 'amount') record.items[itemIdx].subItems[subIdx].amount = Number(val) || 0;
+      else record.items[itemIdx].subItems[subIdx].title = val.trim() || 'Faktura';
+      renderMonthTable();
+    };
+
+    window.deleteSubItem = function(itemIdx, subIdx) {
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.items[itemIdx].subItems.splice(subIdx, 1);
+      if (record.items[itemIdx].subItems.length === 0) {
+        record.items[itemIdx].actual = 0;
+      }
+      renderMonthTable();
+    };
 
     window.updateItemVal = function(idx, field, val) {
       const record = getMonthRecord(getCurrentMonthKey());
@@ -754,15 +1005,18 @@
       renderMonthTable();
     };
 
+    function getRecordTotalIncome(rec) {
+      if (Array.isArray(rec.incomeList)) {
+        return rec.incomeList.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+      }
+      return (rec.income?.salary1 || 0) + (rec.income?.salary2 || 0) + (rec.income?.other || 0);
+    }
+
     function recalculateBudgetsAndCharts() {
       const monthKey = getCurrentMonthKey();
       const record = getMonthRecord(monthKey);
 
-      record.income.salary1 = Number(document.getElementById('incSalary1').value) || 0;
-      record.income.salary2 = Number(document.getElementById('incSalary2').value) || 0;
-      record.income.other = Number(document.getElementById('incOther').value) || 0;
-
-      const totalInc = record.income.salary1 + record.income.salary2 + record.income.other;
+      const totalInc = getRecordTotalIncome(record);
       document.getElementById('totalIncomeDisplay').textContent = `${totalInc.toLocaleString('sv-SE')} kr`;
 
       const sums = {
@@ -834,7 +1088,7 @@
         if (!rec || !rec.items) return;
 
         let mFood = 0, mFuel = 0, mExp = 0, mSav = 0;
-        const mInc = (rec.income?.salary1 || 0) + (rec.income?.salary2 || 0) + (rec.income?.other || 0);
+        const mInc = getRecordTotalIncome(rec);
 
         rec.items.forEach(it => {
           const val = Number(it.actual) || 0;
@@ -930,7 +1184,7 @@
           document.getElementById('cloudSyncStatusText').textContent = `Synkat med Firebase kl. ${new Date().toLocaleTimeString('sv-SE')}`;
           alert('Sparat och krypterat synkat med Firebase!');
         } catch (err) {
-          alert('Sparat lokalt, men Firebase nekade skrivning (kontrollera att din Gmail ligger i Rules): ' + err.message);
+          alert('Sparat lokalt, men Firebase nekade skrivning: ' + err.message);
         }
       } else {
         alert('Månaden sparad lokalt i webbläsaren! Logga in med Google för molnsynk.');
@@ -963,7 +1217,7 @@
             document.getElementById('cloudSyncStatusText').textContent = `Inloggad som ${user.email} • Molnsynk aktiv.`;
           }).catch(err => {
             document.getElementById('cloudSyncStatusText').style.color = 'var(--red)';
-            document.getElementById('cloudSyncStatusText').textContent = `Åtkomst nekad av databasregler (${err.message}). Kontrollera att ${user.email} är inlagd i Firebase Rules.`;
+            document.getElementById('cloudSyncStatusText').textContent = `Åtkomst nekad av databasregler (${err.message}).`;
           });
         } else {
           document.getElementById('authStatusBadge').innerHTML = `<span class="status-dot" style="background:var(--yellow);"></span>Ej inloggad (Lokal lagring)`;
@@ -975,10 +1229,24 @@
     }
 
     // --- EVENT LISTENERS ---
+    document.getElementById('toggleIncomeDrawerBtn').addEventListener('click', () => {
+      incomeDrawerOpen = !incomeDrawerOpen;
+      document.getElementById('incomeDrawerBody').style.display = incomeDrawerOpen ? 'block' : 'none';
+      document.getElementById('incomeChevron').classList.toggle('open', incomeDrawerOpen);
+    });
+
+    document.getElementById('addIncomeBtn').addEventListener('click', () => {
+      const name = document.getElementById('newIncomeName').value.trim() || 'Övrig inkomst';
+      const amount = Number(document.getElementById('newIncomeAmount').value) || 0;
+      const record = getMonthRecord(getCurrentMonthKey());
+      record.incomeList.push({ id: Date.now().toString(), name, amount });
+      document.getElementById('newIncomeName').value = '';
+      document.getElementById('newIncomeAmount').value = '';
+      renderIncomeList();
+      recalculateBudgetsAndCharts();
+    });
+
     document.getElementById('monthPicker').addEventListener('change', renderMonthTable);
-    document.getElementById('incSalary1').addEventListener('input', recalculateBudgetsAndCharts);
-    document.getElementById('incSalary2').addEventListener('input', recalculateBudgetsAndCharts);
-    document.getElementById('incOther').addEventListener('input', recalculateBudgetsAndCharts);
     document.getElementById('kovLunchMode').addEventListener('change', renderMonthTable);
 
     document.getElementById('addKovMemberBtn').addEventListener('click', () => {
@@ -1008,7 +1276,9 @@
       const bucket = document.getElementById('newItemBucket').value;
       if (!name) return;
       const record = getMonthRecord(getCurrentMonthKey());
-      record.items.push({ id: Date.now().toString(), name, bucket, kovKey: null, planned: 0, actual: 0 });
+      const newId = Date.now().toString();
+      record.items.push({ id: newId, name, bucket, kovKey: null, planned: 0, actual: 0, subItems: [] });
+      expandedItemIds.add(newId);
       document.getElementById('newItemName').value = '';
       renderMonthTable();
     });
@@ -1020,10 +1290,10 @@
         alert('Det finns ingen tidigare sparad månad att kopiera ifrån ännu.');
         return;
       }
-      const prev = allMonthsData[keys[keys.length - 1]];
+      const prev = getMonthRecord(keys[keys.length - 1]);
       allMonthsData[cur] = {
-        income: { ...prev.income },
-        items: prev.items.map(it => ({ ...it, actual: 0 }))
+        incomeList: prev.incomeList.map(i => ({ ...i })),
+        items: prev.items.map(it => ({ ...it, actual: 0, subItems: [] }))
       };
       renderMonthTable();
     });
@@ -1040,10 +1310,14 @@
     });
 
     document.getElementById('exportCsvBtn').addEventListener('click', () => {
-      let csv = 'Manad;Post;Korg;Planerat;Utfall\n';
+      let csv = 'Manad;Post;Delpost;Korg;Planerat;Utfall\n';
       Object.keys(allMonthsData).sort().forEach(mk => {
-        (allMonthsData[mk].items || []).forEach(it => {
-          csv += `${mk};"${it.name}";${it.bucket};${it.planned};${it.actual}\n`;
+        const rec = getMonthRecord(mk);
+        (rec.items || []).forEach(it => {
+          csv += `${mk};"${it.name}";"";${it.bucket};${it.planned};${it.actual}\n`;
+          (it.subItems || []).forEach(sub => {
+            csv += `${mk};"${it.name}";"${sub.title}";${it.bucket};0;${sub.amount}\n`;
+          });
         });
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
