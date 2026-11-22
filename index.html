@@ -87,8 +87,7 @@
     .grid-4 {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 22px;
+      gap: 14px;
     }
 
     .grid-2 {
@@ -599,6 +598,84 @@
     </div>
   </div>
 
+  <!-- NY SEKTION: ÅRSÖVERSIKT & STORA NYCKELTAL (IHOPFÄLLBAR OVANFÖR AKTUELL BUDGETMÅNAD) -->
+  <div class="card">
+    <div class="collapsible-header" id="toggleAnnualDrawerBtn">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="chevron open" id="annualChevron">▶</span>
+        <div>
+          <div style="font-weight:700; font-size:0.95rem;">
+            Årsöversikt & Stora Nyckeltal <span class="subcount-badge" id="annualHeaderBadge">2026 • 0 mån</span>
+          </div>
+          <div class="sub-value" style="margin-top:2px;">
+            Klicka för att fälla in/ut hushållets årsinkomst, villans driftkostnad, total boendekostnad och sparande.
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+        <select id="annualYearSelect" style="width:110px; padding:6px 10px;"></select>
+        <div style="text-align:right;">
+          <div style="font-size:1.05rem; font-weight:700; color:var(--green);" id="annualHeaderIncomeRight">Årsinkomst: 0 kr</div>
+          <div class="sub-value" style="margin-top:0;" id="annualHeaderExpenseRight">Årsutgifter: 0 kr</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="annualDrawerBody" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--card-border);">
+      <div class="grid-4" style="margin-bottom:14px;">
+        <div class="bucket-box">
+          <div class="card-title">Hushållets årliga inkomst</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--green);" id="annTotalIncome">0 kr</div>
+          <div class="sub-value" id="annAvgIncome">Snitt: 0 kr/mån</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Villans driftkostnad / år</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="annVillaDrift">0 kr</div>
+          <div class="sub-value" id="annVillaDriftSub">El, värme, VA, sophämtning & försäkring</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Total boendekostnad / år</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--purple);" id="annHousingTotal">0 kr</div>
+          <div class="sub-value" id="annHousingSub">Bolån + Drift (0 % av årsinkomst)</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Totalt sparat / år</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--green);" id="annTotalSavings">0 kr</div>
+          <div class="sub-value" id="annSavingsRate">Årlig sparkvot: 0 %</div>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:0;">
+        <div class="bucket-box">
+          <div class="card-title">Årlig matkostnad</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--yellow);" id="annFoodTotal">0 kr</div>
+          <div class="sub-value" id="annFoodSub">Snitt: 0 kr/mån</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Drivmedel & Bil / år</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--accent);" id="annFuelTotal">0 kr</div>
+          <div class="sub-value" id="annFuelSub">Snitt: 0 kr/mån</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Totala årsutgifter</div>
+          <div style="font-size:1.35rem; font-weight:700;" id="annTotalExpenses">0 kr</div>
+          <div class="sub-value" id="annAvgExpenses">Exkl. sparande (0 kr/mån)</div>
+        </div>
+
+        <div class="bucket-box">
+          <div class="card-title">Årets nettoresultat</div>
+          <div style="font-size:1.35rem; font-weight:700;" id="annNetBalance">0 kr</div>
+          <div class="sub-value" id="annNetSub">Inkomster minus utgifter & sparande</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 2. MÅNADSVÄLJARE, INKOMSTER & NOLLBUDGET-MALL (80/20) -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
@@ -750,7 +827,7 @@
   <div class="card">
     <div class="collapsible-header" id="toggleKovDrawerBtn">
       <div style="display:flex; align-items:center; gap:10px;">
-        <span class="chevron open" id="kovChevron">▶</span>
+        <span class="chevron" id="kovChevron">▶</span>
         <div>
           <div style="font-weight:700; font-size:0.95rem;">
             Konsumentverkets Hushållskostnader 2027 – Referens <span class="subcount-badge" id="kovHeaderSummaryBadge">0 kr/mån</span>
@@ -766,7 +843,7 @@
       </div>
     </div>
 
-    <div id="kovDrawerBody" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--card-border);">
+    <div id="kovDrawerBody" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid var(--card-border);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div id="kovMembersList"></div>
         <div class="row-flex">
@@ -879,13 +956,13 @@
       }
     };
 
-    // Neutral start utan personliga familjenamn för nya besökare
     let kovMembers = JSON.parse(localStorage.getItem('ekonomikollen_kov_members') || 'null') || [
       { id: 'm1', name: 'Vuxen 1', age: '25-50' }
     ];
 
     let allMonthsData = JSON.parse(localStorage.getItem('ekonomikollen_months') || '{}');
     let expandedItemIds = new Set();
+    let annualDrawerOpen = true;
     let incomeDrawerOpen = true;
     let postsDrawerOpen = true;
     let kovDrawerOpen = false;
@@ -956,7 +1033,6 @@
       renderMonthTable();
     };
 
-    // Neutral tom mall (0 kr) när en ny besökare öppnar sidan
     function createEmptyItemsForMonth() {
       return [
         { id: 'i1', name: 'Kreditkort: Mat & Dagligvaror', bucket: 'kredit', kovKey: 'food', planned: 0, actual: 0, subItems: [] },
@@ -1247,7 +1323,7 @@
     }
 
     function getMonthMetrics(rec) {
-      let food = 0, fuel = 0, bolan = 0, exp = 0, sav = 0;
+      let food = 0, fuel = 0, bolan = 0, drift = 0, exp = 0, sav = 0;
       const inc = getRecordTotalIncome(rec);
 
       (rec.items || []).forEach(it => {
@@ -1255,13 +1331,21 @@
         const lower = it.name.toLowerCase();
         if (lower.includes('mat') || lower.includes('ica')) food += val;
         if (lower.includes('drivmedel') || lower.includes('bensin') || lower.includes('bil')) fuel += val;
+        if (
+          lower.includes('el') || lower.includes('värme') || lower.includes('uppvärmning') ||
+          lower.includes('vatten') || lower.includes('avlopp') || lower.includes('renhållning') ||
+          lower.includes('sopor') || lower.includes('försäkring') || lower.includes('drift') ||
+          lower.includes('samfällighet') || lower.includes('bredband')
+        ) {
+          drift += val;
+        }
         if (it.bucket === 'bolan') bolan += val;
         if (it.bucket === 'buffert' || it.bucket === 'mal') sav += val;
         else exp += val;
       });
 
       const savPct = inc > 0 ? (sav / inc) * 100 : 0;
-      return { inc, food, fuel, bolan, exp, sav, savPct };
+      return { inc, food, fuel, bolan, drift, exp, sav, savPct };
     }
 
     function formatMomBadge(elId, diffVal, prevMonthKey, unit = 'kr', lowerIsBetter = true) {
@@ -1300,6 +1384,77 @@
           : `${Math.round(val).toLocaleString('sv-SE')} kr`;
         return `<div class="history-3m-row"><span>${mk}</span><strong>${formatted}</strong></div>`;
       }).join('');
+    }
+
+    // --- UPPDATERA ÅRSÖVERSIKT & STORA NYCKELTAL ---
+    function updateAnnualOverview() {
+      const yearSelect = document.getElementById('annualYearSelect');
+      const curYear = getCurrentMonthKey().slice(0, 4);
+
+      const yearsSet = new Set([curYear]);
+      Object.keys(allMonthsData).forEach(mk => {
+        if (mk && mk.length >= 4) yearsSet.add(mk.slice(0, 4));
+      });
+      const sortedYears = Array.from(yearsSet).sort().reverse();
+
+      const prevSelected = yearSelect.value || curYear;
+      yearSelect.innerHTML = sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+      yearSelect.value = sortedYears.includes(prevSelected) ? prevSelected : curYear;
+
+      const selectedYear = yearSelect.value;
+      const yearKeys = Object.keys(allMonthsData).filter(mk => mk.startsWith(selectedYear + '-')).sort();
+
+      let yInc = 0, yDrift = 0, yBolan = 0, ySav = 0, yFood = 0, yFuel = 0, yExp = 0;
+      let activeMonths = 0;
+
+      yearKeys.forEach(mk => {
+        const m = getMonthMetrics(getMonthRecord(mk));
+        if (m.inc > 0 || m.exp > 0 || m.sav > 0) {
+          activeMonths++;
+          yInc += m.inc;
+          yDrift += m.drift;
+          yBolan += m.bolan;
+          ySav += m.sav;
+          yFood += m.food;
+          yFuel += m.fuel;
+          yExp += m.exp;
+        }
+      });
+
+      const div = activeMonths > 0 ? activeMonths : 1;
+      const housingTotal = yBolan + yDrift;
+      const housingPct = yInc > 0 ? ((housingTotal / yInc) * 100).toFixed(1).replace('.', ',') : '0,0';
+      const savPct = yInc > 0 ? ((ySav / yInc) * 100).toFixed(1).replace('.', ',') : '0,0';
+      const netBalance = yInc - yExp - ySav;
+
+      document.getElementById('annualHeaderBadge').textContent = `${selectedYear} • ${activeMonths} ${activeMonths === 1 ? 'månad' : 'månader'}`;
+      document.getElementById('annualHeaderIncomeRight').textContent = `Årsinkomst: ${Math.round(yInc).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annualHeaderExpenseRight').textContent = `Årsutgifter: ${Math.round(yExp).toLocaleString('sv-SE')} kr`;
+
+      document.getElementById('annTotalIncome').textContent = `${Math.round(yInc).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annAvgIncome').textContent = `Snitt: ${Math.round(yInc / div).toLocaleString('sv-SE')} kr/mån`;
+
+      document.getElementById('annVillaDrift').textContent = `${Math.round(yDrift).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annVillaDriftSub').textContent = `Snitt: ${Math.round(yDrift / div).toLocaleString('sv-SE')} kr/mån (El, VA, Bredband, Förs.)`;
+
+      document.getElementById('annHousingTotal').textContent = `${Math.round(housingTotal).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annHousingSub').textContent = `Bolån + Drift (${housingPct} % av årsinkomst)`;
+
+      document.getElementById('annTotalSavings').textContent = `${Math.round(ySav).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annSavingsRate').textContent = `Årlig sparkvot: ${savPct} % (Mål: 20 %)`;
+
+      document.getElementById('annFoodTotal').textContent = `${Math.round(yFood).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annFoodSub').textContent = `Snitt: ${Math.round(yFood / div).toLocaleString('sv-SE')} kr/mån`;
+
+      document.getElementById('annFuelTotal').textContent = `${Math.round(yFuel).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annFuelSub').textContent = `Snitt: ${Math.round(yFuel / div).toLocaleString('sv-SE')} kr/mån`;
+
+      document.getElementById('annTotalExpenses').textContent = `${Math.round(yExp).toLocaleString('sv-SE')} kr`;
+      document.getElementById('annAvgExpenses').textContent = `Exkl. sparande (${Math.round(yExp / div).toLocaleString('sv-SE')} kr/mån)`;
+
+      const netEl = document.getElementById('annNetBalance');
+      netEl.textContent = `${netBalance >= 0 ? '+' : ''}${Math.round(netBalance).toLocaleString('sv-SE')} kr`;
+      netEl.style.color = netBalance >= 0 ? 'var(--green)' : 'var(--red)';
     }
 
     function recalculateBudgetsAndCharts() {
@@ -1365,6 +1520,7 @@
 
       renderTopPieChart(totalInc, sums);
       updateKpisAndTrendCharts(sums);
+      updateAnnualOverview();
     }
 
     const piePercentageLabelsPlugin = {
@@ -1642,6 +1798,14 @@
     }
 
     // --- EVENT LISTENERS FÖR IHOPFÄLLBARA SEKTIONER & KNAPPAR ---
+    document.getElementById('toggleAnnualDrawerBtn').addEventListener('click', () => {
+      annualDrawerOpen = !annualDrawerOpen;
+      document.getElementById('annualDrawerBody').style.display = annualDrawerOpen ? 'block' : 'none';
+      document.getElementById('annualChevron').classList.toggle('open', annualDrawerOpen);
+    });
+
+    document.getElementById('annualYearSelect').addEventListener('change', updateAnnualOverview);
+
     document.getElementById('toggleIncomeDrawerBtn').addEventListener('click', () => {
       incomeDrawerOpen = !incomeDrawerOpen;
       document.getElementById('incomeDrawerBody').style.display = incomeDrawerOpen ? 'block' : 'none';
@@ -1754,9 +1918,6 @@
       a.click();
     });
 
-    // Initiera vid sidladdning (KOV startar ihopfälld för renare vy)
-    document.getElementById('kovDrawerBody').style.display = 'none';
-    document.getElementById('kovChevron').classList.remove('open');
     getCurrentMonthKey();
     renderKovMembers();
     renderMonthTable();
